@@ -51,7 +51,7 @@ prev_3days = df.iloc[-4:-1]
 
 ndx_close = round(float(current['NDX_Close']), 2)
 ndx_125 = round(float(current['NDX_125EMA']), 2)
-ndx_50 = round(float(current['NDX_50EMA']), 2) # 50일선 변수 복구
+ndx_50 = round(float(current['NDX_50EMA']), 2)
 ndx_rsi = round(float(current['NDX_RSI']), 2)
 sp500_close = round(float(current['SP500_Close']), 2)
 sp500_200 = round(float(current['SP500_200EMA']), 2)
@@ -67,12 +67,10 @@ input_pcr = st.sidebar.number_input("2. 풋콜레이시오 (PCR)", min_value=0.0
 input_hy = st.sidebar.number_input("3. 하이일드 스프레드 (%)", min_value=0.0, max_value=20.0, value=4.0, step=0.1)
 
 # --- 4. 메인 화면 레이아웃 ---
-st.title("🧭 투자 비서 시스템 V2.5")
+st.title("🧭 투자 비서 시스템 V5.5")
 st.markdown("본업에 집중하십시오. 감정에 휘둘리지 않는 데이터 무결성을 최우선으로 보고합니다.")
 st.markdown("---")
 
-# [핵심 수치 요약 레이아웃 - 색상 오류 완벽 수정]
-# 마이너스(-) 기호가 붙으면 빨간색, 없으면 초록색으로 표시되도록 논리 구조 수정
 rsi_status = "-과열 (경계)" if ndx_rsi >= 70 else ("-공포 (기회)" if ndx_rsi <= 30 else "정상 구간")
 vix_status = "-위험 구간" if vix >= 30 else "안정 구간"
 fg_status = "-기회 포착" if input_fg <= 25 else "정상 구간"
@@ -113,32 +111,46 @@ with col_btn3: st.link_button("🔗 연준 하이일드 스프레드 확인", "h
 
 st.markdown("---")
 
-# [전략별 박스 레이아웃]
-st.subheader("🎯 3대 투자 전략별 현재 대응 모드")
+# [전략별 박스 레이아웃 - V5.5 통합 마스터 플랜 적용]
+st.subheader("🎯 3대 투자 전략별 현재 대응 모드 (V5.5 통합)")
 c1, c2, c3 = st.columns(3)
 
 with c1:
-    st.info("#### 🛡️ Hyper-Shield (레버리지)")
-    if ndx_rsi <= 30 or input_fg <= 25: st.error("**액셀러 모드 (Accel)**\n\nQLD 집중 매수 구간")
-    elif is_break_3days: st.warning("**브레이크 (Break)**\n\n주식 매수 중단, 방어자산 적립")
-    else: st.success("**평상시 (Normal)**\n\n기계적 비중 매수 진행")
+    st.info("#### 🛡️ NH ISA\n**하이퍼-실드 V4.0**")
+    if ndx_rsi <= 30: 
+        st.error("**[액셀러 모드]**\n\n나스닥2x 100%")
+    elif is_break_3days: 
+        st.warning("**[브레이크]**\n\n국채 50% / 금 50%")
+    elif ndx_rsi >= 70:
+        st.warning("**[과열 방어]**\n\n나스닥2x 20% / 모멘텀 10% / 국채 35% / 금 35%")
+    else: 
+        st.success("**[평상시]**\n\n나스닥2x 45% / 모멘텀 25% / 국채 15% / 금 15%")
 
 with c2:
-    st.info("#### 🚀 Hyper-Accelerator")
-    if ndx_rsi <= 30: st.error("**액셀러 모드 (Accel)**\n\nMAGS/MGK 집중 매수")
-    elif is_break_3days: st.warning("**브레이크 (Break)**\n\n매수 중단, 방어자산 배분")
-    else: st.success("**평상시 (Normal)**\n\n4:4:1:1 기계적 매수")
+    st.info("#### 🚀 메리츠 해외직투\n**하이퍼-액셀러레이터 V1.3**")
+    if ndx_rsi <= 30: 
+        st.error("**[액셀러 모드]**\n\nMAGS 50% / MGK 50%")
+    elif is_break_3days: 
+        st.warning("**[브레이크]**\n\nTLT 50% / GLDM 50%")
+    elif ndx_rsi >= 70:
+        st.warning("**[과열 방어]**\n\nMAGS 30% / MGK 30% / TLT 20% / GLDM 20%")
+    else: 
+        st.success("**[평상시]**\n\nMAGS 40% / MGK 40% / TLT 10% / GLDM 10%")
 
 with c3:
-    st.info("#### 🧠 스마트 DCA (연금 계좌)")
-    if ndx_rsi <= 30 and input_fg <= 25: st.error("**액셀러 모드 (Accel)**\n\n성장 자산 집중 매수")
-    elif ndx_rsi >= 70: st.warning("**과열 방어 (Defense)**\n\n방어 자산 비중 확대")
-    elif is_break_3days: st.warning("**브레이크 (Break)**\n\n성장 자산 매수 중단")
-    else: st.success("**평상시 (Normal)**\n\n기본 배합비 매수")
+    st.info("#### 🧠 삼성 연금저축\n**하이퍼-스마트 DCA**")
+    if ndx_rsi <= 30: 
+        st.error("**[액셀러 모드]**\n\n빅테크TOP7 62.5% / 모멘텀 37.5%")
+    elif is_break_3days: 
+        st.warning("**[브레이크]**\n\n모멘텀 35% / 동일가중 65%")
+    elif ndx_rsi >= 70:
+        st.warning("**[과열 방어]**\n\n빅테크TOP7 37.5% / 모멘텀 25% / 동일가중 37.5%")
+    else: 
+        st.success("**[평상시]**\n\n빅테크TOP7 55% / 모멘텀 30% / 동일가중 15%")
 
 st.markdown("---")
 
-# [비서의 조언 요약 박스 - 50일선 복구]
+# [비서의 조언 요약 박스]
 st.subheader("📋 비서의 전문 검증 및 조언 레이어")
 with st.expander("상세 분석 결과 보기", expanded=True):
     st.markdown(f"""
@@ -147,11 +159,11 @@ with st.expander("상세 분석 결과 보기", expanded=True):
     3. **단기 선발대 (50일선):** 지수가 50일선({ndx_50:,.2f}) **{'위에서 지지받고 있어 공격적 선발대 투입이 유효합니다.' if ndx_close > ndx_50 else '아래에 있어 아직 선발대 투입은 권장하지 않습니다.'}**
     4. **최종 권고:** """)
     
-    if ndx_rsi <= 30 or input_fg <= 25:
-        st.error("여러 지표가 '공포'를 가리키고 있습니다. 최적의 매수 기회인 **[액셀러 모드]**로 전환하여 공격 자산에 화력을 집중하십시오.")
+    if ndx_rsi <= 30:
+        st.error("나스닥 RSI 30 이하로 공포가 극대화되었습니다. **[액셀러 모드]**로 전환하여 모아둔 실탄으로 핵심 주식을 집중 매수하십시오.")
     elif is_break_3days:
-        st.warning("추세 붕괴(브레이크)가 확인되었습니다. 수동 입력 지표가 호전될 때까지 주식 추가 매수를 멈추고 방어 자산 비중을 지키십시오.")
+        st.warning("125일선 추세 붕괴(브레이크)가 확인되었습니다. 주식 매수를 중단하고 안전 자산을 100% 적립하십시오.")
     elif ndx_rsi >= 70:
-        st.warning("시장이 과열되었습니다. 스마트 DCA 전략에 따라 방어 자산을 늘리되, 기존 자산은 절대 매도하지 마십시오.")
+        st.warning("나스닥 RSI 70 이상으로 고점 부담이 증가한 과매수 구간입니다. **[과열 방어]** 모드로 전환하여 공격 자산을 축소하고 방어 자산을 선제 확보하십시오.")
     else:
-        st.success("대부분의 지표가 정상 범위 내에 있습니다. 시장 노이즈를 무시하고 이번 달 정해진 금액을 기계적으로 배분하십시오.")
+        st.success("안정적 성장 추세입니다. **[평상시]** 모드로 기본 비중대로 투자금을 기계적으로 집행하십시오.")
