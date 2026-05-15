@@ -3,7 +3,7 @@ import yfinance as yf
 import pandas as pd
 
 # --- 1. 페이지 설정 및 디자인 ---
-st.set_page_config(page_title="투자 내비게이션 V2.7", layout="wide")
+st.set_page_config(page_title="투자 내비게이션 V2.8", layout="wide")
 
 st.markdown("""
     <style>
@@ -62,11 +62,11 @@ input_pcr = st.sidebar.number_input("2. 풋콜레이시오 (PCR)", 0.0, 3.0, 0.9
 input_hy = st.sidebar.number_input("3. 하이일드 스프레드 (%)", 0.0, 20.0, 4.0, 0.1)
 
 # --- 4. 메인 화면 ---
-st.title("🧭 통합 투자 내비게이션 V2.7")
+st.title("🧭 통합 투자 내비게이션 V2.8")
 st.markdown("본업에 집중하십시오. 감정에 휘둘리지 않는 데이터 무결성을 최우선으로 보고합니다.")
 st.markdown("---")
 
-# 요약 카드 (색상 오류 수정 유지)
+# 요약 카드 
 rsi_status = "-과열 (경계)" if ndx_rsi >= 70 else ("-공포 (기회)" if ndx_rsi <= 30 else "정상 구간")
 vix_status = "-위험 구간" if vix >= 30 else "안정 구간"
 fg_status = "-기회 포착" if input_fg <= 25 else "정상 구간"
@@ -80,7 +80,6 @@ col4.metric("HY 스프레드", f"{input_hy}%", hy_status)
 
 st.markdown("### 📊 2. 메인 감시 지표 (Primary Triggers)")
 
-# 50일선 제외하고 다시 7개 지표로 원상 복구 (V5.5 마스터 플랜 기준)
 trigger_data = {
     "지표": ["나스닥 100 지수 (RSI)", "VIX 지수", "S&P 500 (200일선)", "나스닥 100 (125일선)", "공포와 탐욕 (수동)", "풋콜레이시오 (수동)", "하이일드 스프레드 (수동)"],
     "트리거 발생 기준": ["30 이하 / 70 이상", "30 이상", "지수 이탈", "3거래일 연속 하회", "25 미만", "1.1 이상", "5.0% 이상"],
@@ -108,34 +107,34 @@ with col_btn3: st.link_button("🔗 연준 하이일드 스프레드 확인", "h
 
 st.markdown("---")
 
-# 3대 전략 섹션 (V5.5 로직 유지)
+# 3대 전략 섹션 (이름 변경 및 조건 문구 추가)
 st.subheader("🎯 3대 투자 전략별 현재 대응 모드 (V5.5 통합)")
 c1, c2, c3 = st.columns(3)
 
 with c1:
-    st.info("#### 🛡️ NH ISA\n**하이퍼-실드 V4.0**")
-    if ndx_rsi <= 30: st.error("**[액셀러 모드]**\n\n나스닥2x 100%")
-    elif is_break_3days: st.warning("**[브레이크]**\n\n국채 50% / 금 50%")
-    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n\n나스닥2x 20% / 모멘텀 10% / 국채 35% / 금 35%")
-    else: st.success("**[평상시]**\n\n나스닥2x 45% / 모멘텀 25% / 국채 15% / 금 15%")
+    st.info("#### 🛡️ ISA-NH\n**하이퍼-실드 V4.0**")
+    if ndx_rsi <= 30: st.error("**[액셀러 모드]**\n나스닥 RSI 30 이하 (과매도 구간)\n\n나스닥2x 100%")
+    elif is_break_3days: st.warning("**[브레이크]**\n나스닥 125일선 3일 연속 종가 하회\n\n국채 50% / 금 50%")
+    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n나스닥 RSI 70 이상 (과매수 구간)\n\n나스닥2x 20% / 모멘텀 10% / 국채 35% / 금 35%")
+    else: st.success("**[평상시]**\n나스닥 125일선 상단 AND RSI 40~69\n\n나스닥2x 45% / 모멘텀 25% / 국채 15% / 금 15%")
 
 with c2:
-    st.info("#### 🚀 메리츠 해외직투\n**하이퍼-액셀러레이터 V1.3**")
-    if ndx_rsi <= 30: st.error("**[액셀러 모드]**\n\nMAGS 50% / MGK 50%")
-    elif is_break_3days: st.warning("**[브레이크]**\n\nTLT 50% / GLDM 50%")
-    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n\nMAGS 30% / MGK 30% / TLT 20% / GLDM 20%")
-    else: st.success("**[평상시]**\n\nMAGS 40% / MGK 40% / TLT 10% / GLDM 10%")
+    st.info("#### 🚀 해외직투-메리츠\n**하이퍼-액셀러레이터 V1.3**")
+    if ndx_rsi <= 30: st.error("**[액셀러 모드]**\n나스닥 RSI 30 이하 (과매도 구간)\n\nMAGS 50% / MGK 50%")
+    elif is_break_3days: st.warning("**[브레이크]**\n나스닥 125일선 3일 연속 종가 하회\n\nTLT 50% / GLDM 50%")
+    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n나스닥 RSI 70 이상 (과매수 구간)\n\nMAGS 30% / MGK 30% / TLT 20% / GLDM 20%")
+    else: st.success("**[평상시]**\n나스닥 125일선 상단 AND RSI 40~69\n\nMAGS 40% / MGK 40% / TLT 10% / GLDM 10%")
 
 with c3:
-    st.info("#### 🧠 삼성 연금저축\n**하이퍼-스마트 DCA**")
-    if ndx_rsi <= 30: st.error("**[액셀러 모드]**\n\n빅테크TOP7 62.5% / 모멘텀 37.5%")
-    elif is_break_3days: st.warning("**[브레이크]**\n\n모멘텀 35% / 동일가중 65%")
-    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n\n빅테크TOP7 37.5% / 모멘텀 25% / 동일가중 37.5%")
-    else: st.success("**[평상시]**\n\n빅테크TOP7 55% / 모멘텀 30% / 동일가중 15%")
+    st.info("#### 🧠 연금-삼성\n**하이퍼-스마트 DCA**")
+    if ndx_rsi <= 30: st.error("**[액셀러 모드]**\n나스닥 RSI 30 이하 (과매도 구간)\n\n빅테크TOP7 62.5% / 모멘텀 37.5%")
+    elif is_break_3days: st.warning("**[브레이크]**\n나스닥 125일선 3일 연속 종가 하회\n\n모멘텀 35% / 동일가중 65%")
+    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n나스닥 RSI 70 이상 (과매수 구간)\n\n빅테크TOP7 37.5% / 모멘텀 25% / 동일가중 37.5%")
+    else: st.success("**[평상시]**\n나스닥 125일선 상단 AND RSI 40~69\n\n빅테크TOP7 55% / 모멘텀 30% / 동일가중 15%")
 
 st.markdown("---")
 
-# [비서의 조언 요약 박스 - 50일선 유기적 설명 강화]
+# [비서의 조언 요약 박스]
 st.subheader("📋 비서의 전문 검증 및 조언 레이어")
 with st.expander("상세 분석 결과 보기", expanded=True):
     st.markdown(f"""
@@ -153,6 +152,29 @@ with st.expander("상세 분석 결과 보기", expanded=True):
     else:
         st.success("안정적 성장 추세입니다. **[평상시]** 모드로 기본 비중대로 투자금을 기계적으로 집행하십시오.")
 
+st.markdown("---")
+
+# [새로 추가된 하단 표: 통합 4단계 대응 시스템]
+st.subheader("⚙️ 통합 4단계 대응 시스템 및 트리거 정의")
+
+system_df = pd.DataFrame({
+    "모드": ["평상시", "과열 방어", "브레이크", "액셀러"],
+    "트리거 조건 (Trigger Condition)": [
+        "나스닥 125일선 상단 AND RSI 40~69",
+        "나스닥 RSI 70 이상 (과매수 구간)",
+        "나스닥 125일선 3일 연속 종가 하회",
+        "나스닥 RSI 30 이하 (과매도 구간)"
+    ],
+    "로직 정의": [
+        "안정적 성장 추세. 기본 비중대로 투자금 집행.",
+        "고점 부담 증가. 공격 자산 축소, 방어 자산 선제 확보.",
+        "추세 붕괴. 주식 매수 중단 및 안전 자산 100% 적립.",
+        "공포 극대화. 모아둔 실탄으로 핵심 주식 집중 매수."
+    ]
+})
+
+st.table(system_df)
+
 # 📚 지표 백과사전 및 가이드
 st.markdown("---")
 st.subheader("📚 지표별 상세 정의 및 트리거 가이드")
@@ -160,8 +182,8 @@ with st.expander("📖 각 지표가 무엇을 의미하고, 언제 움직여야
     st.markdown("""
     ### 1. 심리 및 추세 지표
     * **나스닥 RSI (심리):** 시장의 매수세가 얼마나 강한지 나타냅니다. 70 이상은 '과열(신규 매수 축소)', 30 이하는 '공포(적극 매수 기회)'를 뜻합니다.
-    * **나스닥 125일선 (전략적 추세):** 약 6개월간의 평균 가격입니다. 3일 연속 이탈 시 추세가 무너진 것으로 보고 주식 매수를 전면 중단(브레이크)합니다. [cite: 5]
-    * **나스닥 50일선 (전술적 보조):** 약 2.5개월간의 평균 가격으로 단기 흐름을 봅니다. RSI가 과열이어도 지수가 50일선 위에 있다면, 기존에 사둔 주식은 아직 팔 때가 아니라는 '보유(Hold)'의 근거가 됩니다. 
+    * **나스닥 125일선 (전략적 추세):** 약 6개월간의 평균 가격입니다. 3일 연속 이탈 시 추세가 무너진 것으로 보고 주식 매수를 전면 중단(브레이크)합니다.
+    * **나스닥 50일선 (전술적 보조):** 약 2.5개월간의 평균 가격으로 단기 흐름을 봅니다. RSI가 과열이어도 지수가 50일선 위에 있다면, 기존에 사둔 주식은 아직 팔 때가 아니라는 '보유(Hold)'의 근거가 됩니다.
 
     ### 2. 시장 위험 및 공포 지표
     * **VIX 지수 (변동성):** 30 이상으로 치솟으면 시장이 패닉 상태임을 의미하며 바닥이 멀지 않았음을 시사합니다.
