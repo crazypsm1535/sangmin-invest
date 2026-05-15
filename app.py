@@ -7,11 +7,9 @@ st.set_page_config(page_title="투자 내비게이션", layout="wide")
 
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid #e9ecef; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
-    h1 { color: #1e3a8a; font-weight: 800; }
-    h2 { color: #1e3a8a; border-left: 5px solid #1e3a8a; padding-left: 10px; margin-top: 30px; }
-    .stTable { background-color: white; border-radius: 10px; overflow: hidden; }
+    .stMetric { padding: 10px; border-radius: 10px; border: 1px solid rgba(128, 128, 128, 0.2); }
+    h1 { font-weight: 800; }
+    h2 { border-left: 5px solid #4A90E2; padding-left: 10px; margin-top: 30px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -53,6 +51,7 @@ prev_3days = df.iloc[-4:-1]
 
 ndx_close = round(float(current['NDX_Close']), 2)
 ndx_125 = round(float(current['NDX_125EMA']), 2)
+ndx_50 = round(float(current['NDX_50EMA']), 2) # 50일선 변수 복구
 ndx_rsi = round(float(current['NDX_RSI']), 2)
 sp500_close = round(float(current['SP500_Close']), 2)
 sp500_200 = round(float(current['SP500_200EMA']), 2)
@@ -72,12 +71,18 @@ st.title("🧭 투자 비서 시스템 V2.5")
 st.markdown("본업에 집중하십시오. 감정에 휘둘리지 않는 데이터 무결성을 최우선으로 보고합니다.")
 st.markdown("---")
 
-# [핵심 수치 요약 레이아웃 - 카드 디자인]
+# [핵심 수치 요약 레이아웃 - 색상 오류 완벽 수정]
+# 마이너스(-) 기호가 붙으면 빨간색, 없으면 초록색으로 표시되도록 논리 구조 수정
+rsi_status = "-과열 (경계)" if ndx_rsi >= 70 else ("-공포 (기회)" if ndx_rsi <= 30 else "정상 구간")
+vix_status = "-위험 구간" if vix >= 30 else "안정 구간"
+fg_status = "-기회 포착" if input_fg <= 25 else "정상 구간"
+hy_status = "-위험 감지" if input_hy >= 5.0 else "안정 구간"
+
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("나스닥 RSI", f"{ndx_rsi}", "과열" if ndx_rsi >= 70 else "공포" if ndx_rsi <= 30 else "정상")
-col2.metric("VIX 지수", f"{vix}", "위험" if vix >= 30 else "안정", delta_color="inverse")
-col3.metric("공포와 탐욕", f"{input_fg}", "기회" if input_fg <= 25 else "정상")
-col4.metric("HY 스프레드", f"{input_hy}%", "경고" if input_hy >= 5.0 else "안정", delta_color="inverse")
+col1.metric("나스닥 RSI", f"{ndx_rsi}", rsi_status)
+col2.metric("VIX 지수", f"{vix}", vix_status)
+col3.metric("공포와 탐욕", f"{input_fg}", fg_status)
+col4.metric("HY 스프레드", f"{input_hy}%", hy_status)
 
 st.markdown("### 📊 2. 메인 감시 지표 (Primary Triggers)")
 
@@ -133,13 +138,15 @@ with c3:
 
 st.markdown("---")
 
-# [비서의 조언 요약 박스]
+# [비서의 조언 요약 박스 - 50일선 복구]
 st.subheader("📋 비서의 전문 검증 및 조언 레이어")
 with st.expander("상세 분석 결과 보기", expanded=True):
     st.markdown(f"""
     1. **시장 위험도:** 현재 하이일드 스프레드는 **{input_hy}%**입니다. {'금융 시스템 리스크가 감지되니 주의하십시오.' if input_hy >= 5.0 else '시스템 리스크는 낮으며 안정적입니다.'}
-    2. **추세 분석:** 나스닥 지수가 125일선 대비 **{'위' if ndx_close > ndx_125 else '아래'}**에 위치해 있으며, 거래량은 **{'폭발적(신뢰도 높음)' if vol_surge else '평이함'}** 수준입니다.
-    3. **최종 권고:** """)
+    2. **추세 분석 (125일선):** 나스닥 지수가 125일선 대비 **{'위' if ndx_close > ndx_125 else '아래'}**에 위치해 있으며, 거래량은 **{'폭발적(신뢰도 높음)' if vol_surge else '평이함'}** 수준입니다.
+    3. **단기 선발대 (50일선):** 지수가 50일선({ndx_50:,.2f}) **{'위에서 지지받고 있어 공격적 선발대 투입이 유효합니다.' if ndx_close > ndx_50 else '아래에 있어 아직 선발대 투입은 권장하지 않습니다.'}**
+    4. **최종 권고:** """)
+    
     if ndx_rsi <= 30 or input_fg <= 25:
         st.error("여러 지표가 '공포'를 가리키고 있습니다. 최적의 매수 기회인 **[액셀러 모드]**로 전환하여 공격 자산에 화력을 집중하십시오.")
     elif is_break_3days:
