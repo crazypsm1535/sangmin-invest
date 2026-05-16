@@ -3,7 +3,7 @@ import yfinance as yf
 import pandas as pd
 
 # --- 1. 페이지 설정 및 디자인 ---
-st.set_page_config(page_title="투자 내비게이션 V2.9", layout="wide")
+st.set_page_config(page_title="투자 내비게이션 V2.9.1", layout="wide")
 
 st.markdown("""
     <style>
@@ -63,7 +63,7 @@ input_hy = st.sidebar.number_input("3. 하이일드 스프레드 (%)", 0.0, 20.0
 
 st.sidebar.markdown("---")
 
-# [새로 추가된 기능] 자산 배분 계산기 UI
+# 자산 배분 계산기 UI (줄바꿈 최적화)
 st.sidebar.title("🧮 자산 배분 계산기")
 with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
     tab1, tab2 = st.tabs(["금액 ➔ 비중", "비중 ➔ 금액"])
@@ -79,10 +79,10 @@ with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
         
         if tot_val > 0:
             st.info(f"**총 자산: {tot_val:,.0f}**\n\n"
-                    f"• 항목 1: {(cv1/tot_val)*100:.1f}%\n"
-                    f"• 항목 2: {(cv2/tot_val)*100:.1f}%\n"
-                    f"• 항목 3: {(cv3/tot_val)*100:.1f}%\n"
-                    f"• 항목 4: {(cv4/tot_val)*100:.1f}%")
+                    f"- **항목 1:** {(cv1/tot_val)*100:.1f}%\n\n"
+                    f"- **항목 2:** {(cv2/tot_val)*100:.1f}%\n\n"
+                    f"- **항목 3:** {(cv3/tot_val)*100:.1f}%\n\n"
+                    f"- **항목 4:** {(cv4/tot_val)*100:.1f}%")
         else:
             st.info("금액을 입력해주세요.")
 
@@ -100,13 +100,13 @@ with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
             st.error(f"⚠️ 비중 합계 오류! (현재: {tot_pct}%)")
         else:
             st.success(f"**배분 목표 (총 {t_asset:,.0f})**\n\n"
-                       f"• 항목 1: {t_asset * (cp1/100):,.0f}\n"
-                       f"• 항목 2: {t_asset * (cp2/100):,.0f}\n"
-                       f"• 항목 3: {t_asset * (cp3/100):,.0f}\n"
-                       f"• 항목 4: {t_asset * (cp4/100):,.0f}")
+                       f"- **항목 1:** {t_asset * (cp1/100):,.0f}\n\n"
+                       f"- **항목 2:** {t_asset * (cp2/100):,.0f}\n\n"
+                       f"- **항목 3:** {t_asset * (cp3/100):,.0f}\n\n"
+                       f"- **항목 4:** {t_asset * (cp4/100):,.0f}")
 
 # --- 4. 메인 화면 ---
-st.title("🧭 통합 투자 내비게이션 V2.9")
+st.title("🧭 통합 투자 내비게이션 V2.9.1")
 st.markdown("본업에 집중하십시오. 감정에 휘둘리지 않는 데이터 무결성을 최우선으로 보고합니다.")
 st.markdown("---")
 
