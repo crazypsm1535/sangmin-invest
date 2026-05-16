@@ -3,7 +3,7 @@ import yfinance as yf
 import pandas as pd
 
 # --- 1. 페이지 설정 및 디자인 ---
-st.set_page_config(page_title="투자 내비게이션 V2.8", layout="wide")
+st.set_page_config(page_title="투자 내비게이션 V2.9", layout="wide")
 
 st.markdown("""
     <style>
@@ -55,14 +55,58 @@ sp500_close, sp500_200 = round(current['SP500_Close'], 2), round(current['SP500_
 vol_surge = current['Volume'] > current['Vol_20MA'] * 1.5
 is_break_3days = (prev_3days['NDX_Close'] < prev_3days['NDX_125EMA']).all() and (ndx_close < ndx_125)
 
-# --- 3. 사이드바 ---
+# --- 3. 사이드바 (지표 입력 및 계산기 탑재) ---
 st.sidebar.title("🛠️ 지표 수동 입력")
 input_fg = st.sidebar.number_input("1. 공포와 탐욕 지수 (0~100)", 0, 100, 50)
 input_pcr = st.sidebar.number_input("2. 풋콜레이시오 (PCR)", 0.0, 3.0, 0.9, 0.01)
 input_hy = st.sidebar.number_input("3. 하이일드 스프레드 (%)", 0.0, 20.0, 4.0, 0.1)
 
+st.sidebar.markdown("---")
+
+# [새로 추가된 기능] 자산 배분 계산기 UI
+st.sidebar.title("🧮 자산 배분 계산기")
+with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
+    tab1, tab2 = st.tabs(["금액 ➔ 비중", "비중 ➔ 금액"])
+    
+    # 1번 탭: 금액 -> 비중 계산
+    with tab1:
+        st.caption("각 자산의 평가금액을 입력하면 비중이 자동 계산됩니다.")
+        cv1 = st.number_input("항목 1 금액", value=0, step=10000, key="c1_1")
+        cv2 = st.number_input("항목 2 금액", value=0, step=10000, key="c1_2")
+        cv3 = st.number_input("항목 3 금액", value=0, step=10000, key="c1_3")
+        cv4 = st.number_input("항목 4 금액", value=0, step=10000, key="c1_4")
+        tot_val = cv1 + cv2 + cv3 + cv4
+        
+        if tot_val > 0:
+            st.info(f"**총 자산: {tot_val:,.0f}**\n\n"
+                    f"• 항목 1: {(cv1/tot_val)*100:.1f}%\n"
+                    f"• 항목 2: {(cv2/tot_val)*100:.1f}%\n"
+                    f"• 항목 3: {(cv3/tot_val)*100:.1f}%\n"
+                    f"• 항목 4: {(cv4/tot_val)*100:.1f}%")
+        else:
+            st.info("금액을 입력해주세요.")
+
+    # 2번 탭: 비중 -> 금액 계산
+    with tab2:
+        st.caption("총 자산과 목표 비중(%)을 입력하면 배분 금액이 계산됩니다.")
+        t_asset = st.number_input("총 투자 금액", value=1000000, step=10000, key="c2_tot")
+        cp1 = st.number_input("항목 1 비중 (%)", value=40.0, step=1.0, key="c2_1")
+        cp2 = st.number_input("항목 2 비중 (%)", value=30.0, step=1.0, key="c2_2")
+        cp3 = st.number_input("항목 3 비중 (%)", value=20.0, step=1.0, key="c2_3")
+        cp4 = st.number_input("항목 4 비중 (%)", value=10.0, step=1.0, key="c2_4")
+        tot_pct = cp1 + cp2 + cp3 + cp4
+        
+        if abs(tot_pct - 100.0) > 0.01:
+            st.error(f"⚠️ 비중 합계 오류! (현재: {tot_pct}%)")
+        else:
+            st.success(f"**배분 목표 (총 {t_asset:,.0f})**\n\n"
+                       f"• 항목 1: {t_asset * (cp1/100):,.0f}\n"
+                       f"• 항목 2: {t_asset * (cp2/100):,.0f}\n"
+                       f"• 항목 3: {t_asset * (cp3/100):,.0f}\n"
+                       f"• 항목 4: {t_asset * (cp4/100):,.0f}")
+
 # --- 4. 메인 화면 ---
-st.title("🧭 통합 투자 내비게이션 V2.8")
+st.title("🧭 통합 투자 내비게이션 V2.9")
 st.markdown("본업에 집중하십시오. 감정에 휘둘리지 않는 데이터 무결성을 최우선으로 보고합니다.")
 st.markdown("---")
 
@@ -107,7 +151,7 @@ with col_btn3: st.link_button("🔗 연준 하이일드 스프레드 확인", "h
 
 st.markdown("---")
 
-# 3대 전략 섹션 (이름 변경 및 조건 문구 추가)
+# 3대 전략 섹션
 st.subheader("🎯 3대 투자 전략별 현재 대응 모드 (V5.5 통합)")
 c1, c2, c3 = st.columns(3)
 
@@ -154,7 +198,7 @@ with st.expander("상세 분석 결과 보기", expanded=True):
 
 st.markdown("---")
 
-# [새로 추가된 하단 표: 통합 4단계 대응 시스템]
+# 하단 표: 통합 4단계 대응 시스템
 st.subheader("⚙️ 통합 4단계 대응 시스템 및 트리거 정의")
 
 system_df = pd.DataFrame({
