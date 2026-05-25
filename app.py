@@ -11,6 +11,9 @@ st.markdown("""
     h1 { font-weight: 800; }
     h2 { border-left: 5px solid #1e293b; padding-left: 10px; margin-top: 30px; }
     .stAlert { border-left: 5px solid #334155 !important; }
+    /* 테이블 내부 텍스트 좌측 정렬 및 가독성 패딩 조절 */
+    td { text-align: left !important; vertical-align: middle !important; padding: 12px !important; }
+    th { background-color: #f8fafc !important; font-weight: bold !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -89,7 +92,6 @@ input_pcr = st.sidebar.number_input("2. 풋콜레이시오 (PCR)", 0.0, 3.0, 1.2
 input_hy = st.sidebar.number_input("3. 하이일드 스프레드 (%)", 0.0, 20.0, 4.0, 0.1)
 input_hy_peakout = st.sidebar.checkbox("하이일드 스프레드 하락 전환(Peak-out) 확인됨", value=True)
 
-# 바닥 확인 5대 필수 지표 연동 로직
 condition_rsi = ndx_rsi <= 30
 condition_pcr = input_pcr >= 1.1
 condition_fg = input_fg <= 25
@@ -161,21 +163,29 @@ col2.metric("VIX 지수 (실시간)", f"{vix:.2f}", vix_status)
 col3.metric("공포와 탐욕 지수 (수동연동)", f"{input_fg}", fg_status)
 col4.metric("HY 스프레드 / PCR (수동연동)", f"{input_hy}% / {input_pcr:.2f}", f"{hy_status} | {pcr_status}")
 
-# 🛠️ [요청 반영 1] 메인 감시 지표를 최상단(1번 항목)으로 배치
+# --- 1. 메인 감시 지표 (수정된 가독성 버전) ---
 st.markdown("---")
 st.markdown("### 📊 1. 메인 감시 지표 (Primary Triggers)")
 
-# 🛠️ [요청 반영 2] 트리거 발생 기준 칸에 직관적인 지표 상황 설명 완벽 추가
+# 🛠️ [가독성 대폭 업그레이드] 줄바꿈과 이모지를 활용한 시각적 분리 구조 적용
 trigger_data = {
-    "지표": ["나스닥 100 지수 (RSI)", "VIX 지수", "S&P 500 (200일선)", "나스닥 100 (125일선)", "공포와 탐욕 (수동)", "풋콜레이시오 (수동)", "하이일드 스프레드 (수동)"],
-    "트리거 발생 기준": [
-        "30 이하(과매도 기회) / 70 이상(과매수 경계)", 
-        "30 이상 (시장 변동성 폭발 및 패닉 투매 감지)", 
-        "지수 이탈 (장기 기관 자금 이탈 및 추세 붕괴)", 
-        "3거래일 연속 하회 (중장기 추세 하락 전환 확정)", 
-        "25 미만 (비이성적 투매 구간 - Extreme Fear)", 
-        "1.1 이상 (하락 베팅 압도 - 반등 자금 장전 완료)", 
-        "5.0% 이상 또는 피크아웃 검증 (거시 신용위험 진단)"
+    "지표": [
+        "나스닥 100 지수 (RSI)", 
+        "VIX 지수", 
+        "S&P 500 (200일선)", 
+        "나스닥 100 (125일선)", 
+        "공포와 탐욕 (수동)", 
+        "풋콜레이시오 (수동)", 
+        "하이일드 스프레드 (수동)"
+    ],
+    "트리거 발생 기준 (핵심 요약 및 세부 진단 가이드)": [
+        "📉 30 이하 (과매도 기회) \n\n 📈 70 이상 (과매수 경계)", 
+        "🚨 30 이상 \n\n (시장 변동성 폭발 및 패닉 투매 상태 감지)", 
+        "❌ 지수 이탈 \n\n (장기 기관 자금 탈출 및 대형 추세 붕괴 위험)", 
+        "⚠️ 3거래일 연속 하회 \n\n (중장기 추세 하락 전환 확정 트리거)", 
+        "💀 25 미만 \n\n (비이성적 공포 구간 - Extreme Fear 기회 포착)", 
+        "📊 1.1 이상 \n\n (하락 베팅 극대화 - 강한 반등 탄력 장전 완료)", 
+        "⚡ 5.0% 이상 또는 피크아웃 \n\n (거시 경제 부도 위험 및 시스템 리스크 필터)"
     ],
     "현재 수치 / 상태": [
         f"{ndx_rsi:.2f}", f"{vix:.2f}", f"{sp500_close:,.2f} (기준: {sp500_200:,.2f})", f"{ndx_close:,.2f} (기준: {ndx_125:,.2f})", 
@@ -193,8 +203,7 @@ trigger_data = {
 }
 st.table(pd.DataFrame(trigger_data))
 
-
-# 🛠️ [요청 반영 1] 수동 지표 확인 창 라우터를 2번 항목으로 바로 연달아 배치
+# --- 2. 심리 및 매크로 수동 지표 확인 ---
 st.markdown("---")
 st.markdown("### 🔍 2. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
 st.caption("자동 크롤링이 불가능한 핵심 지표들을 수동 검증하기 위한 데이터 소스 및 API 확인 라우터입니다.")
@@ -214,7 +223,6 @@ with col_l3:
     st.info("#### 🔵 연준 하이일드 스프레드 소스")
     st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 미국 기업 부도 신용 위험 필터\n- **API 상태:** 개별 키 요구 (수동 조회 필수)")
     st.link_button("🌐 FRED 공식 소스 확인하기", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
-
 
 st.markdown("---")
 
