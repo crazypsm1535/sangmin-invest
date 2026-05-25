@@ -161,9 +161,42 @@ col2.metric("VIX 지수 (실시간)", f"{vix:.2f}", vix_status)
 col3.metric("공포와 탐욕 지수 (수동연동)", f"{input_fg}", fg_status)
 col4.metric("HY 스프레드 / PCR (수동연동)", f"{input_hy}% / {input_pcr:.2f}", f"{hy_status} | {pcr_status}")
 
-# 🛠️ [완벽 복원] 상민님이 직접 열어서 데이터를 확인하고 주소를 테스트하는 수동 지표 확인 창 섹션
+# 🛠️ [요청 반영 1] 메인 감시 지표를 최상단(1번 항목)으로 배치
 st.markdown("---")
-st.markdown("### 🔍 1. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
+st.markdown("### 📊 1. 메인 감시 지표 (Primary Triggers)")
+
+# 🛠️ [요청 반영 2] 트리거 발생 기준 칸에 직관적인 지표 상황 설명 완벽 추가
+trigger_data = {
+    "지표": ["나스닥 100 지수 (RSI)", "VIX 지수", "S&P 500 (200일선)", "나스닥 100 (125일선)", "공포와 탐욕 (수동)", "풋콜레이시오 (수동)", "하이일드 스프레드 (수동)"],
+    "트리거 발생 기준": [
+        "30 이하(과매도 기회) / 70 이상(과매수 경계)", 
+        "30 이상 (시장 변동성 폭발 및 패닉 투매 감지)", 
+        "지수 이탈 (장기 기관 자금 이탈 및 추세 붕괴)", 
+        "3거래일 연속 하회 (중장기 추세 하락 전환 확정)", 
+        "25 미만 (비이성적 투매 구간 - Extreme Fear)", 
+        "1.1 이상 (하락 베팅 압도 - 반등 자금 장전 완료)", 
+        "5.0% 이상 또는 피크아웃 검증 (거시 신용위험 진단)"
+    ],
+    "현재 수치 / 상태": [
+        f"{ndx_rsi:.2f}", f"{vix:.2f}", f"{sp500_close:,.2f} (기준: {sp500_200:,.2f})", f"{ndx_close:,.2f} (기준: {ndx_125:,.2f})", 
+        f"{input_fg}", f"{input_pcr}", f"{input_hy}%"
+    ],
+    "현재 판정": [
+        "🔴 트리거 발동" if ndx_rsi <= 30 or ndx_rsi >= 70 else "🟢 정상",
+        "🔴 위험" if vix >= 30 else "🟢 정상",
+        "🔴 200일선 이탈" if sp500_close < sp500_200 else "🟢 지지 중",
+        "🟡 브레이크 진입" if is_break_3days else "🟢 정상",
+        "🔴 기회 포착" if input_fg <= 25 else "🟢 정상",
+        "🔴 바닥 확인" if input_pcr >= 1.1 else "🟢 정상",
+        "🔴 위험 감지" if input_hy >= 5.0 else "🟢 안정"
+    ]
+}
+st.table(pd.DataFrame(trigger_data))
+
+
+# 🛠️ [요청 반영 1] 수동 지표 확인 창 라우터를 2번 항목으로 바로 연달아 배치
+st.markdown("---")
+st.markdown("### 🔍 2. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
 st.caption("자동 크롤링이 불가능한 핵심 지표들을 수동 검증하기 위한 데이터 소스 및 API 확인 라우터입니다.")
 
 col_l1, col_l2, col_l3 = st.columns(3)
@@ -182,28 +215,6 @@ with col_l3:
     st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 미국 기업 부도 신용 위험 필터\n- **API 상태:** 개별 키 요구 (수동 조회 필수)")
     st.link_button("🌐 FRED 공식 소스 확인하기", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
 
-
-st.markdown("---")
-st.markdown("### 📊 2. 메인 감시 지표 (Primary Triggers)")
-
-trigger_data = {
-    "지표": ["나스닥 100 지수 (RSI)", "VIX 지수", "S&P 500 (200일선)", "나스닥 100 (125일선)", "공포와 탐욕 (수동)", "풋콜레이시오 (수동)", "하이일드 스프레드 (수동)"],
-    "트리거 발생 기준": ["30 이하 / 70 이상", "30 이상", "지수 이탈", "3거래일 연속 하회", "25 미만", "1.1 이상", "5.0% 이상 또는 피크아웃 검증"],
-    "현재 수치 / 상태": [
-        f"{ndx_rsi:.2f}", f"{vix:.2f}", f"{sp500_close:,.2f} (기준: {sp500_200:,.2f})", f"{ndx_close:,.2f} (기준: {ndx_125:,.2f})", 
-        f"{input_fg}", f"{input_pcr}", f"{input_hy}%"
-    ],
-    "현재 판정": [
-        "🔴 트리거 발동" if ndx_rsi <= 30 or ndx_rsi >= 70 else "🟢 정상",
-        "🔴 위험" if vix >= 30 else "🟢 정상",
-        "🔴 200일선 이탈" if sp500_close < sp500_200 else "🟢 지지 중",
-        "🟡 브레이크 진입" if is_break_3days else "🟢 정상",
-        "🔴 기회 포착" if input_fg <= 25 else "🟢 정상",
-        "🔴 바닥 확인" if input_pcr >= 1.1 else "🟢 정상",
-        "🔴 위험 감지" if input_hy >= 5.0 else "🟢 안정"
-    ]
-}
-st.table(pd.DataFrame(trigger_data))
 
 st.markdown("---")
 
