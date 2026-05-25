@@ -148,21 +148,24 @@ else:
     st.markdown("본업에 집중하십시오. 국내 절세 계좌의 보유분 전량 스위칭 로직이 동기화된 코드입니다.")
 st.markdown("---")
 
-# 요약 카드
+# 🛠️ [완벽 복원 및 업그레이드] 최상단 4단 모니터링 요약 박스 레이아웃
 rsi_status = "-과열 (경계)" if ndx_rsi >= 70 else ("-공포 (기회)" if ndx_rsi <= 30 else "정상 구간")
 vix_status = "-위험 구간" if vix >= 30 else "안정 구간"
-fg_status = "-기회 포착" if input_fg <= 25 else "정상 구간"
+fg_status = "-극단적 공포" if input_fg <= 25 else "정상 구간"
 hy_status = "-위험 감지" if input_hy >= 5.0 else "안정 구간"
+pcr_status = "-바닥 신호" if input_pcr >= 1.1 else "정상 구간"
 
+# 상민님이 수동 입력한 값들도 상단에서 크게 모니터링할 수 있도록 4열 구성으로 전면 복원
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("나스닥 RSI", f"{ndx_rsi:.2f}", rsi_status)
-col2.metric("VIX 지수", f"{vix:.2f}", vix_status)
-col3.metric("공포와 탐욕", f"{input_fg}", fg_status)
-col4.metric("HY 스프레드", f"{input_hy}%", hy_status)
+col1.metric("나스닥 RSI (실시간)", f"{ndx_rsi:.2f}", rsi_status)
+col2.metric("VIX 지수 (실시간)", f"{vix:.2f}", vix_status)
+col3.metric("공포와 탐욕 지수 (수동연동)", f"{input_fg}", fg_status)
+col4.metric("HY 스프레드 / PCR (수동연동)", f"{input_hy}% / {input_pcr:.2f}", f"{hy_status} | {pcr_status}")
 
+st.markdown("---")
 st.markdown("### 📊 2. 메인 감시 지표 (Primary Triggers)")
 
-# 🛠️ 상민님이 지표 입력할 때 즉시 누를 수 있도록 테이블 바로 위(원래 위치)로 완벽 복원
+# 외부 링크 버튼들 위치
 col_btn1, col_btn2, col_btn3 = st.columns(3)
 with col_btn1: st.link_button("🔗 CNN 공포와 탐욕 지수 확인", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
 with col_btn2: st.link_button("🔗 CBOE 풋콜레이시오 (PCR) 확인", "https://www.cboe.com/us/options/market_statistics/", use_container_width=True)
