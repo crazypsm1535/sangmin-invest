@@ -148,28 +148,43 @@ else:
     st.markdown("본업에 집중하십시오. 국내 절세 계좌의 보유분 전량 스위칭 로직이 동기화된 코드입니다.")
 st.markdown("---")
 
-# 🛠️ [완벽 복원 및 업그레이드] 최상단 4단 모니터링 요약 박스 레이아웃
+# 최상단 요약 카드
 rsi_status = "-과열 (경계)" if ndx_rsi >= 70 else ("-공포 (기회)" if ndx_rsi <= 30 else "정상 구간")
 vix_status = "-위험 구간" if vix >= 30 else "안정 구간"
 fg_status = "-극단적 공포" if input_fg <= 25 else "정상 구간"
 hy_status = "-위험 감지" if input_hy >= 5.0 else "안정 구간"
 pcr_status = "-바닥 신호" if input_pcr >= 1.1 else "정상 구간"
 
-# 상민님이 수동 입력한 값들도 상단에서 크게 모니터링할 수 있도록 4열 구성으로 전면 복원
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("나스닥 RSI (실시간)", f"{ndx_rsi:.2f}", rsi_status)
 col2.metric("VIX 지수 (실시간)", f"{vix:.2f}", vix_status)
 col3.metric("공포와 탐욕 지수 (수동연동)", f"{input_fg}", fg_status)
 col4.metric("HY 스프레드 / PCR (수동연동)", f"{input_hy}% / {input_pcr:.2f}", f"{hy_status} | {pcr_status}")
 
+# 🛠️ [완벽 복원] 상민님이 직접 열어서 데이터를 확인하고 주소를 테스트하는 수동 지표 확인 창 섹션
+st.markdown("---")
+st.markdown("### 🔍 1. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
+st.caption("자동 크롤링이 불가능한 핵심 지표들을 수동 검증하기 위한 데이터 소스 및 API 확인 라우터입니다.")
+
+col_l1, col_l2, col_l3 = st.columns(3)
+with col_l1:
+    st.info("#### 🔴 CNN 공포와 탐욕 지수 소스")
+    st.markdown("- **제공처:** CNN Business Market\n- **성격:** 군중 주관적 투자 심리 필터\n- **API 상태:** 외부 차단 (수동 조회 필수)")
+    st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
+
+with col_l2:
+    st.info("#### 🟢 CBOE 토탈 풋콜레이시오 소스")
+    st.markdown("- **제공처:** Chicago Board Options Exchange\n- **성격:** 파생상품 하락 베팅 강도 필터\n- **API 상태:** 유료 라이선스 (수동 조회 필수)")
+    st.link_button("🌐 CBOE 공식 소스 확인하기", "https://www.cboe.com/us/options/market_statistics/", use_container_width=True)
+
+with col_l3:
+    st.info("#### 🔵 연준 하이일드 스프레드 소스")
+    st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 미국 기업 부도 신용 위험 필터\n- **API 상태:** 개별 키 요구 (수동 조회 필수)")
+    st.link_button("🌐 FRED 공식 소스 확인하기", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
+
+
 st.markdown("---")
 st.markdown("### 📊 2. 메인 감시 지표 (Primary Triggers)")
-
-# 외부 링크 버튼들 위치
-col_btn1, col_btn2, col_btn3 = st.columns(3)
-with col_btn1: st.link_button("🔗 CNN 공포와 탐욕 지수 확인", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
-with col_btn2: st.link_button("🔗 CBOE 풋콜레이시오 (PCR) 확인", "https://www.cboe.com/us/options/market_statistics/", use_container_width=True)
-with col_btn3: st.link_button("🔗 연준 하이일드 스프레드 확인", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
 
 trigger_data = {
     "지표": ["나스닥 100 지수 (RSI)", "VIX 지수", "S&P 500 (200일선)", "나스닥 100 (125일선)", "공포와 탐욕 (수동)", "풋콜레이시오 (수동)", "하이일드 스프레드 (수동)"],
