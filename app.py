@@ -59,7 +59,6 @@ real_is_break_3days = (prev_3days['NDX_Close'] < prev_3days['NDX_125EMA']).all()
 # --- 3. 사이드바 (지표 입력 및 계산기 탑재) ---
 st.sidebar.title("🧪 모드 설정 및 입력")
 
-# ★ 핵심: 시뮬레이션 모드 스위치 추가
 sim_mode = st.sidebar.checkbox("🚨 인위적 테스트 모드 활성화", value=False, help="체크 시 실시간 데이터 대신 사이드바 입력값으로 강제 테스트합니다.")
 
 st.sidebar.markdown("---")
@@ -95,9 +94,8 @@ condition_rsi = ndx_rsi <= 30
 condition_pcr = input_pcr >= 1.1
 condition_fg = input_fg <= 25
 condition_vix = vix >= 30
-condition_hy = input_hy_peakout  # 하이일드 스프레드 피크아웃 여부
+condition_hy = input_hy_peakout
 
-# 5대 지표가 전부 True일 때만 액셀러 가동
 accelerator_triggered = condition_rsi and condition_pcr and condition_fg and condition_vix and condition_hy
 
 st.sidebar.markdown("---")
@@ -163,6 +161,12 @@ col3.metric("공포와 탐욕", f"{input_fg}", fg_status)
 col4.metric("HY 스프레드", f"{input_hy}%", hy_status)
 
 st.markdown("### 📊 2. 메인 감시 지표 (Primary Triggers)")
+
+# 🛠️ 상민님이 지표 입력할 때 즉시 누를 수 있도록 테이블 바로 위(원래 위치)로 완벽 복원
+col_btn1, col_btn2, col_btn3 = st.columns(3)
+with col_btn1: st.link_button("🔗 CNN 공포와 탐욕 지수 확인", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
+with col_btn2: st.link_button("🔗 CBOE 풋콜레이시오 (PCR) 확인", "https://www.cboe.com/us/options/market_statistics/", use_container_width=True)
+with col_btn3: st.link_button("🔗 연준 하이일드 스프레드 확인", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
 
 trigger_data = {
     "지표": ["나스닥 100 지수 (RSI)", "VIX 지수", "S&P 500 (200일선)", "나스닥 100 (125일선)", "공포와 탐욕 (수동)", "풋콜레이시오 (수동)", "하이일드 스프레드 (수동)"],
