@@ -1,4 +1,4 @@
-import streamlit st
+import streamlit as st
 import yfinance as yf
 import pandas as pd
 
@@ -151,7 +151,7 @@ vix_status = "위험 구간" if vix >= 30 else "안정 구간"
 fg_status = "극단적 공포" if input_fg <= 25 else "정상 구간"
 hy_status = "위험 감지" if input_hy >= 5.0 else "안정 구간"
 
-# 🛠️ [요청 반영 1] 최상단 4대 지표 수치 증발 완전 복구 + 글자 잘림 없는 수평 1줄 정렬 프리미엄 카드 연동
+# 🛠️ 최상단 4대 지표 수치 증발 완전 복구 + 글자 잘림 없는 수평 1줄 정렬 프리미엄 카드 연동
 col1, col2, col3, col4 = st.columns(4)
 card_css = "background-color:#1e293b; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; height:38px;"
 
@@ -164,7 +164,7 @@ with col3:
 with col4:
     st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1; white-space:nowrap;">HY스프레드 / PCR</span><span style="font-size:14px; font-weight:bold; color:#38bdf8;">{input_hy}% / {input_pcr:.2f}</span></div>', unsafe_allow_html=True)
 
-# 🛠️ [요청 반영 2, 3] 흰색 마스킹 버그 완전 차단 및 설명 가로 1줄 고정형 다크 아키텍처 테이블 생성
+# 🛠️ 흰색 마스킹 버그 완전 차단 및 설명 가로 1줄 고정형 다크 아키텍처 테이블 생성
 st.markdown("## 📊 1. 메인 감시 지표 (Primary Triggers)")
 
 rows_data = [
