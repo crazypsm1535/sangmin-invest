@@ -5,7 +5,6 @@ import pandas as pd
 # --- 1. 페이지 설정 및 디자인 ---
 st.set_page_config(page_title="투자 내비게이션 V3.0 (Dynamic)", layout="wide")
 
-# 🛠️ [가독성 및 간격 압축 업그레이드] 테이블 내부 위아래 여백(Padding)을 최소화하는 CSS 주입
 st.markdown("""
     <style>
     .stMetric { padding: 10px; border-radius: 10px; border: 1px solid rgba(128, 128, 128, 0.2); }
@@ -13,7 +12,7 @@ st.markdown("""
     h2 { border-left: 5px solid #1e293b; padding-left: 10px; margin-top: 30px; }
     .stAlert { border-left: 5px solid #334155 !important; }
     
-    /* 🛠️ 위아래 넓은 간격을 타이트하게 줄이는 핵심 스타일링 */
+    /* 🛠️ [가독성 유지 + 상하 여백 극강 압축] 상민님 맞춤형 콤팩트 스타일링 */
     th { background-color: #f8fafc !important; font-weight: bold !important; padding: 6px 12px !important; }
     td { text-align: left !important; vertical-align: middle !important; padding: 5px 12px !important; line-height: 1.3 !important; }
     div[data-testid="stTable"] table { margin-top: 0px !important; margin-bottom: 0px !important; }
@@ -166,11 +165,10 @@ col2.metric("VIX 지수 (실시간)", f"{vix:.2f}", vix_status)
 col3.metric("공포와 탐욕 지수 (수동연동)", f"{input_fg}", fg_status)
 col4.metric("HY 스프레드 / PCR (수동연동)", f"{input_hy}% / {input_pcr:.2f}", f"{hy_status} | {pcr_status}")
 
-# --- 1. 메인 감시 지표 (상하 여백 최소화 콤팩트 버전) ---
+# --- 1. 메인 감시 지표 (상하 여백 압축 완료) ---
 st.markdown("---")
 st.markdown("### 📊 1. 메인 감시 지표 (Primary Triggers)")
 
-# 설명 내용은 유지하되, 개행 테크닉과 CSS 압축을 통해 한 행에 콤팩트하게 밀착되도록 수정
 trigger_data = {
     "지표": [
         "나스닥 100 지수 (RSI)", 
@@ -218,9 +216,9 @@ with col_l1:
     st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
 
 with col_l2:
-    st.info("#### 🟢 CBOE 토탈 풋콜레이시오 소스 (★모바일 최적화 대체 링크)")
-    st.markdown("- **제공처:** TradingView / MarketWatch\n- **성격:** 스마트폰 화면 잘림 없는 반응형 인터페이스 제공\n- **특징:** 실시간 Total P/C Ratio 수치를 단일 차트 및 대형 폰트로 직관적 표기")
-    # 🛠️ 스마트폰에서 짤려 보이는 CBOE 메인 대신, 모바일 가독성 및 단일 지표 스캔이 매우 뛰어난 마켓워치/트레이딩뷰 기반 직관적 경로로 수정
+    st.info("#### 🟢 CBOE 토탈 풋콜레이시오 소스 (★교정 완료)")
+    st.markdown("- **제공처:** MarketWatch Markets Data\n- **성격:** 스마트폰 화면 잘림 방지 모바일 반응형 페이지 인터페이스\n- **특징:** 검색 필요 없이 풋콜레이시오 수치를 다이렉트로 매칭 표기")
+    # 🛠️ [주소 교정] 마켓워치 내부 지수 직결 URL('https://www.marketwatch.com/investing/index/pcratio')로 정밀 이식 완료
     st.link_button("📱 모바일 직관적 소스 확인", "https://www.marketwatch.com/investing/index/pcratio", use_container_width=True)
 
 with col_l3:
@@ -297,7 +295,7 @@ with st.expander("상세 분석 결과 및 리스크 진단 보기", expanded=Tr
     else:
         st.markdown("   * 단기 상승 동력이 꺾였습니다. 리밸런싱 지침에 기계적으로 대응할 준비를 하십시오.")
         
-    st.markdown(f"4. **바닥 신호 강도 검증 (5대 필수 지표):** 총 5개 중 **{met_conditions}개** 충족 중입니다.")
+    st.markdown(f"4. **바닥 신호 강도 검증 (5대 필수 지표):** 총 5개 중 **{met_conditions}개** 충증 중입니다.")
     st.markdown("5. **상민님 전담 최종 권고 지침:**")
     
     if accelerator_triggered:
