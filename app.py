@@ -5,15 +5,18 @@ import pandas as pd
 # --- 1. 페이지 설정 및 디자인 ---
 st.set_page_config(page_title="투자 내비게이션 V3.0 (Dynamic)", layout="wide")
 
+# 🛠️ [가독성 및 간격 압축 업그레이드] 테이블 내부 위아래 여백(Padding)을 최소화하는 CSS 주입
 st.markdown("""
     <style>
     .stMetric { padding: 10px; border-radius: 10px; border: 1px solid rgba(128, 128, 128, 0.2); }
     h1 { font-weight: 800; }
     h2 { border-left: 5px solid #1e293b; padding-left: 10px; margin-top: 30px; }
     .stAlert { border-left: 5px solid #334155 !important; }
-    /* 테이블 내부 텍스트 좌측 정렬 및 가독성 패딩 조절 */
-    td { text-align: left !important; vertical-align: middle !important; padding: 12px !important; }
-    th { background-color: #f8fafc !important; font-weight: bold !important; }
+    
+    /* 🛠️ 위아래 넓은 간격을 타이트하게 줄이는 핵심 스타일링 */
+    th { background-color: #f8fafc !important; font-weight: bold !important; padding: 6px 12px !important; }
+    td { text-align: left !important; vertical-align: middle !important; padding: 5px 12px !important; line-height: 1.3 !important; }
+    div[data-testid="stTable"] table { margin-top: 0px !important; margin-bottom: 0px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -163,11 +166,11 @@ col2.metric("VIX 지수 (실시간)", f"{vix:.2f}", vix_status)
 col3.metric("공포와 탐욕 지수 (수동연동)", f"{input_fg}", fg_status)
 col4.metric("HY 스프레드 / PCR (수동연동)", f"{input_hy}% / {input_pcr:.2f}", f"{hy_status} | {pcr_status}")
 
-# --- 1. 메인 감시 지표 (수정된 가독성 버전) ---
+# --- 1. 메인 감시 지표 (상하 여백 최소화 콤팩트 버전) ---
 st.markdown("---")
 st.markdown("### 📊 1. 메인 감시 지표 (Primary Triggers)")
 
-# 🛠️ [가독성 대폭 업그레이드] 줄바꿈과 이모지를 활용한 시각적 분리 구조 적용
+# 설명 내용은 유지하되, 개행 테크닉과 CSS 압축을 통해 한 행에 콤팩트하게 밀착되도록 수정
 trigger_data = {
     "지표": [
         "나스닥 100 지수 (RSI)", 
@@ -179,13 +182,13 @@ trigger_data = {
         "하이일드 스프레드 (수동)"
     ],
     "트리거 발생 기준 (핵심 요약 및 세부 진단 가이드)": [
-        "📉 30 이하 (과매도 기회) \n\n 📈 70 이상 (과매수 경계)", 
-        "🚨 30 이상 \n\n (시장 변동성 폭발 및 패닉 투매 상태 감지)", 
-        "❌ 지수 이탈 \n\n (장기 기관 자금 탈출 및 대형 추세 붕괴 위험)", 
-        "⚠️ 3거래일 연속 하회 \n\n (중장기 추세 하락 전환 확정 트리거)", 
-        "💀 25 미만 \n\n (비이성적 공포 구간 - Extreme Fear 기회 포착)", 
-        "📊 1.1 이상 \n\n (하락 베팅 극대화 - 강한 반등 탄력 장전 완료)", 
-        "⚡ 5.0% 이상 또는 피크아웃 \n\n (거시 경제 부도 위험 및 시스템 리스크 필터)"
+        "📉 30 이하 (과매도 기회) / 📈 70 이상 (과매수 경계)", 
+        "🚨 30 이상 (시장 변동성 폭발 및 패닉 투매 상태 감지)", 
+        "❌ 지수 이탈 (장기 기관 자금 탈출 및 대형 추세 붕괴 위험)", 
+        "⚠️ 3거래일 연속 하회 (중장기 추세 하락 전환 확정 트리거)", 
+        "💀 25 미만 (비이성적 공포 구간 - Extreme Fear 기회 포착)", 
+        "📊 1.1 이상 (하락 베팅 극대화 - 강한 반등 탄력 장전 완료)", 
+        "⚡ 5.0% 이상 또는 피크아웃 (거시 경제 부도 위험 및 시스템 리스크 필터)"
     ],
     "현재 수치 / 상태": [
         f"{ndx_rsi:.2f}", f"{vix:.2f}", f"{sp500_close:,.2f} (기준: {sp500_200:,.2f})", f"{ndx_close:,.2f} (기준: {ndx_125:,.2f})", 
@@ -215,9 +218,10 @@ with col_l1:
     st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
 
 with col_l2:
-    st.info("#### 🟢 CBOE 토탈 풋콜레이시오 소스")
-    st.markdown("- **제공처:** Chicago Board Options Exchange\n- **성격:** 파생상품 하락 베팅 강도 필터\n- **API 상태:** 유료 라이선스 (수동 조회 필수)")
-    st.link_button("🌐 CBOE 공식 소스 확인하기", "https://www.cboe.com/us/options/market_statistics/", use_container_width=True)
+    st.info("#### 🟢 CBOE 토탈 풋콜레이시오 소스 (★모바일 최적화 대체 링크)")
+    st.markdown("- **제공처:** TradingView / MarketWatch\n- **성격:** 스마트폰 화면 잘림 없는 반응형 인터페이스 제공\n- **특징:** 실시간 Total P/C Ratio 수치를 단일 차트 및 대형 폰트로 직관적 표기")
+    # 🛠️ 스마트폰에서 짤려 보이는 CBOE 메인 대신, 모바일 가독성 및 단일 지표 스캔이 매우 뛰어난 마켓워치/트레이딩뷰 기반 직관적 경로로 수정
+    st.link_button("📱 모바일 직관적 소스 확인", "https://www.marketwatch.com/investing/index/pcratio", use_container_width=True)
 
 with col_l3:
     st.info("#### 🔵 연준 하이일드 스프레드 소스")
