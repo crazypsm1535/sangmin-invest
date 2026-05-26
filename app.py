@@ -5,14 +5,19 @@ import pandas as pd
 # --- 1. 페이지 설정 및 디자인 ---
 st.set_page_config(page_title="투자 내비게이션 V3.0 (Dynamic)", layout="wide")
 
-# 🛠️ [상민님 피드백 적극 반영] 상단 여백 최소화 및 테이블 내부 글자 줄바꿈 강제 금지 (무조건 1줄 고정)
+# 🛠️ [타이틀 잘림 해결 & 표 1줄 고정]
 st.markdown("""
     <style>
-    /* 화면 최상단 불필요한 공백 제로화하여 한 화면 고정 */
-    .block-container { padding-top: 1.2rem !important; padding-bottom: 1rem !important; }
-    h1 { margin-top: 0px !important; margin-bottom: 2px !important; font-size: 26px !important; font-weight: 800; }
-    h2 { border-left: 5px solid #3b82f6; padding-left: 10px; margin-top: 15px !important; margin-bottom: 5px !important; font-size: 18px !important; }
+    /* 타이틀이 잘리지 않도록 상단 여백(padding-top)을 안전한 2.5rem으로 복구 */
+    .block-container { padding-top: 2.5rem !important; padding-bottom: 1rem !important; }
+    h1 { margin-top: 0px !important; margin-bottom: 5px !important; font-size: 26px !important; font-weight: 800; }
+    h2 { border-left: 5px solid #3b82f6; padding-left: 10px; margin-top: 20px !important; margin-bottom: 5px !important; font-size: 18px !important; }
     .stAlert { border-left: 5px solid #334155 !important; padding: 8px !important; }
+    
+    /* 🛠️ 에러 나던 HTML 표 대신, 정식 표를 무조건 1줄로 고정시키는 CSS 적용 */
+    th { background-color: #1e293b !important; color: #ffffff !important; font-weight: bold !important; padding: 8px 12px !important; font-size: 13px !important; white-space: nowrap !important; }
+    td { text-align: left !important; vertical-align: middle !important; padding: 8px 12px !important; font-size: 13px !important; white-space: nowrap !important; }
+    div[data-testid="stTable"] table { width: 100% !important; margin-top: 0px !important; margin-bottom: 0px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -150,8 +155,9 @@ rsi_status = "과열 (경계)" if ndx_rsi >= 70 else ("공포 (기회)" if ndx_r
 vix_status = "위험 구간" if vix >= 30 else "안정 구간"
 fg_status = "극단적 공포" if input_fg <= 25 else "정상 구간"
 hy_status = "위험 감지" if input_hy >= 5.0 else "안정 구간"
+pcr_status = "바닥 신호" if input_pcr >= 1.1 else "정상 구간"
 
-# 🛠️ 최상단 4대 지표 수치 증발 완전 복구 + 글자 잘림 없는 수평 1줄 정렬 프리미엄 카드 연동
+# 🛠️ [검증 완료] 상민님이 만족하신 최상단 4대 카드 (높이 축소 + 가로 정렬 유지)
 col1, col2, col3, col4 = st.columns(4)
 card_css = "background-color:#1e293b; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; height:38px;"
 
@@ -164,47 +170,43 @@ with col3:
 with col4:
     st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1; white-space:nowrap;">HY스프레드 / PCR</span><span style="font-size:14px; font-weight:bold; color:#38bdf8;">{input_hy}% / {input_pcr:.2f}</span></div>', unsafe_allow_html=True)
 
-# 🛠️ 흰색 마스킹 버그 완전 차단 및 설명 가로 1줄 고정형 다크 아키텍처 테이블 생성
+# 🛠️ [HTML 에러 박멸] 순수 Streamlit st.table 객체로 복귀하여 깨짐 방지 & CSS를 통해 1줄로 강제 고정
 st.markdown("## 📊 1. 메인 감시 지표 (Primary Triggers)")
 
-rows_data = [
-    ("나스닥 100 지수 (RSI)", "🔵 [기회] 30 이하  /  🔴 [경계] 70 이상  ➔  나스닥 과열 및 심리 상태 감시", f"{ndx_rsi:.2f}", "🔴 트리거 발동" if ndx_rsi <= 30 or ndx_rsi >= 70 else "🟢 정상"),
-    ("VIX 지수", "🚨 [위험] 30 이상  ➔  시장 변동성 폭발 및 글로벌 패닉 투매 수준 감지", f"{vix:.2f}", "🔴 위험" if vix >= 30 else "🟢 정상"),
-    ("S&P 500 (200일선)", "❌ [붕괴] 지수 이탈  ➔  장기 우상향 추세선 이탈 및 기관 자금 이탈 위험", f"{sp500_close:,.2f} (기준: {sp500_200:,.2f})", "🔴 200일선 이탈" if sp500_close < sp500_200 else "🟢 지지 중"),
-    ("나스닥 100 (125일선)", "⚠️ [경고] 3거래일 연속 하회  ➔  중장기 추세 하락 전환 확정 최종 브레이크 필터", f"{ndx_close:,.2f} (기준: {ndx_125:,.2f})", "🟡 브레이크 진입" if is_break_3days else "🟢 정상"),
-    ("공포와 탐욕 (수동)", "💀 [공포] 25 미만  ➔  비이성적 투매 구간 (Extreme Fear 역발상 매수 타이밍)", f"{input_fg}", "🔴 기회 포착" if input_fg <= 25 else "🟢 정상"),
-    ("풋콜레이시오 (수동)", "📊 [바닥] 1.1 이상  ➔  하락 베팅 극대화 상태 (강력한 기술적 반등 힘 응축 완료)", f"{input_pcr}", "🔴 바닥 확인" if input_pcr >= 1.1 else "🟢 정상"),
-    ("하이일드 스프레드 (수동)", "⚡ [위험] 5.0% 이상 또는 피크아웃 미확정  ➔  거시 신용 위험 시스템 가동 방어", f"{input_hy}%", "🔴 위험 감지" if input_hy >= 5.0 else "🟢 안정")
-]
-
-table_rows = ""
-for title, criteria, val, status in rows_data:
-    status_clr = "#ef4444" if "🔴" in status or "🟡" in status else "#10b981"
-    table_rows += f"""
-    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size:13px; color:#e2e8f0;">
-        <td style="padding: 6px 12px; font-weight:bold; white-space:nowrap;">{title}</td>
-        <td style="padding: 6px 12px; white-space:nowrap;">{criteria}</td>
-        <td style="padding: 6px 12px; white-space:nowrap;">{val}</td>
-        <td style="padding: 6px 12px; color:{status_clr}; font-weight:bold; white-space:nowrap;">{status}</td>
-    </tr>
-    """
-
-premium_table = f"""
-<table style="width:100%; border-collapse: collapse; background-color:#0f172a; border: 1px solid rgba(255,255,255,0.1);">
-    <thead>
-        <tr style="background-color: #1e293b; color: #ffffff; font-size: 13px; text-align: left;">
-            <th style="padding: 8px 12px; border-bottom: 2px solid rgba(255,255,255,0.15); white-space:nowrap;">지표</th>
-            <th style="padding: 8px 12px; border-bottom: 2px solid rgba(255,255,255,0.15); white-space:nowrap;">트리거 발생 기준</th>
-            <th style="padding: 8px 12px; border-bottom: 2px solid rgba(255,255,255,0.15); white-space:nowrap;">현재 수치 / 상태</th>
-            <th style="padding: 8px 12px; border-bottom: 2px solid rgba(255,255,255,0.15); white-space:nowrap;">현재 판정</th>
-        </tr>
-    </thead>
-    <tbody>
-        {table_rows}
-    </tbody>
-</table>
-"""
-st.markdown(premium_table, unsafe_allow_html=True)
+trigger_data = {
+    "지표": [
+        "나스닥 100 지수 (RSI)", 
+        "VIX 지수", 
+        "S&P 500 (200일선)", 
+        "나스닥 100 (125일선)", 
+        "공포와 탐욕 (수동)", 
+        "풋콜레이시오 (수동)", 
+        "하이일드 스프레드 (수동)"
+    ],
+    "트리거 발생 기준": [
+        "🔵 [기회] 30 이하  /  🔴 [경계] 70 이상  ➔  나스닥 100 심리 과열 상태 감시", 
+        "🚨 [위험] 30 이상  ➔  시장 변동성 폭발 및 글로벌 패닉 투매 수준 감지", 
+        "❌ [붕괴] 지수 이탈  ➔  장기 우상향 추세선 붕괴 및 거대 기관 자금 이탈 신호", 
+        "⚠️ [경고] 3거래일 연속 하회  ➔  중장기 추세 하락 전환 확정 최종 브레이크 필터", 
+        "💀 [공포] 25 미만  ➔  비이성적 투매 구간 (Extreme Fear 역발상 매수 타이밍)", 
+        "📊 [바닥] 1.1 이상  ➔  하락 베팅 극대화 상태 (강력한 기술적 반등 힘 응축 완료)", 
+        "⚡ [위험] 5.0% 이상 또는 피크아웃 미확정  ➔  거시 신용 위험 시스템 가동 방어"
+    ],
+    "현재 수치 / 상태": [
+        f"{ndx_rsi:.2f}", f"{vix:.2f}", f"{sp500_close:,.2f} (기준: {sp500_200:,.2f})", f"{ndx_close:,.2f} (기준: {ndx_125:,.2f})", 
+        f"{input_fg}", f"{input_pcr}", f"{input_hy}%"
+    ],
+    "현재 판정": [
+        "🔴 트리거 발동" if ndx_rsi <= 30 or ndx_rsi >= 70 else "🟢 정상",
+        "🔴 위험" if vix >= 30 else "🟢 정상",
+        "🔴 200일선 이탈" if sp500_close < sp500_200 else "🟢 지지 중",
+        "🟡 브레이크 진입" if is_break_3days else "🟢 정상",
+        "🔴 기회 포착" if input_fg <= 25 else "🟢 정상",
+        "🔴 바닥 확인" if input_pcr >= 1.1 else "🟢 정상",
+        "🔴 위험 감지" if input_hy >= 5.0 else "🟢 안정"
+    ]
+}
+st.table(pd.DataFrame(trigger_data))
 
 # --- 2. 심리 및 매크로 수동 지표 확인 ---
 st.markdown("---")
@@ -218,9 +220,9 @@ with col_l1:
     st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
 
 with col_l2:
-    st.info("#### 🟢 CBOE 풋콜레이시오 소스 (★YCharts 오타 정밀 교정)")
-    st.markdown("- **제공처:** 글로벌 금융 전문 포털 와이차트 (YCharts)\n- **성격:** 모바일 팝업 차단 및 로그인 세션 에러가 100% 제거된 클린망 채널\n- **특징:** 주소 오타 교정으로 404 에러를 완벽 차단했으며 터치 즉시 CBOE Total Put/Call Ratio 수치가 헤더 전면에 바로 로드됨")
-    # 🛠️ [404 해결] 오타였던 주소를 정식 고유 API 웹 명칭(total_putcall_ratio)으로 완벽하게 수리 이식
+    st.info("#### 🟢 CBOE 풋콜레이시오 소스 (★YCharts 검증 채널)")
+    st.markdown("- **제공처:** 글로벌 금융 전문 포털 와이차트 (YCharts)\n- **성격:** 모바일 팝업 차단 및 로그인 세션 에러가 100% 제거된 클린망 채널\n- **특징:** 터치 즉시 CBOE Total Put/Call Ratio 수치가 헤더 전면에 바로 로드됨")
+    # 🛠️ [검증 완료] 상민님이 작동을 확인하신 YCharts 링크 유지
     st.link_button("📱 모바일 직관적 소스 확인", "https://ycharts.com/indicators/total_putcall_ratio", use_container_width=True)
 
 with col_l3:
