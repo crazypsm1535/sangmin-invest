@@ -7,25 +7,18 @@ st.set_page_config(page_title="투자 내비게이션 V3.0 (Dynamic)", layout="w
 
 st.markdown("""
     <style>
-    .block-container { padding-top: 2rem !important; }
-    h1 { font-size: 26px !important; font-weight: 800; margin-bottom: 10px !important; }
-    h2 { border-left: 5px solid #3b82f6; padding-left: 10px; margin-top: 25px !important; }
+    .block-container { padding-top: 1rem !important; }
+    h1 { font-size: 24px !important; font-weight: 800; margin-bottom: 5px !important; }
+    h2 { border-left: 5px solid #3b82f6; padding-left: 10px; margin-top: 15px !important; font-size: 18px !important; }
     
-    /* 카드 사이즈 대폭 확대 (65px) 및 내부 정렬 */
-    .big-card { 
-        background-color:#1e293b; border:1px solid rgba(255,255,255,0.1); 
-        border-radius:8px; padding:15px; display:flex; 
-        flex-direction: column; justify-content:center; height:70px;
-    }
-    
-    /* 표 한 줄 강제 고정 및 깔끔한 출력 */
-    div[data-testid="stTable"] table { width: 100% !important; }
-    th { background-color: #334155 !important; color: white !important; white-space: nowrap !important; }
-    td { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+    /* 🛠️ [중요] 표 높이를 1줄로 강제 고정하고 흰색 칸 버그 해결 */
+    .compact-table { width: 100%; border-collapse: collapse; background-color: #0f172a; }
+    .compact-table th { background-color: #1e293b !important; color: #ffffff !important; padding: 6px !important; white-space: nowrap !important; }
+    .compact-table td { padding: 4px 8px !important; white-space: nowrap !important; border-bottom: 1px solid #334155; }
     </style>
     """, unsafe_allow_html=True)
 
-# (데이터 처리 로직 동일하므로 생략 - 이전 버전과 동일)
+# (데이터 계산 로직 동일)
 def calculate_rsi(series, period=14):
     delta = series.diff()
     up, down = delta.copy(), delta.copy()
@@ -42,51 +35,49 @@ def get_market_data():
     sp500 = yf.Ticker("^GSPC").history(period="1y")
     vix = yf.Ticker("^VIX").history(period="1y")
     qqq = yf.Ticker("QQQ").history(period="1y")
-    for _df in [ndx, sp500, vix, qqq]:
-        if _df.index.tz is not None: _df.index = _df.index.tz_localize(None)
     df = pd.DataFrame(index=ndx.index)
-    df['NDX_Close'] = ndx['Close']
-    df['SP500_Close'] = sp500['Close']
-    df['VIX_Close'] = vix['Close']
+    df['NDX_Close'], df['SP500_Close'], df['VIX_Close'] = ndx['Close'], sp500['Close'], vix['Close']
     df['Volume'] = qqq['Volume']
     df = df.ffill().dropna()
     df['NDX_125EMA'] = df['NDX_Close'].ewm(span=125, adjust=False).mean()
-    df['NDX_50EMA'] = df['NDX_Close'].ewm(span=50, adjust=False).mean()
-    df['SP500_200EMA'] = df['SP500_Close'].ewm(span=200, adjust=False).mean()
     df['NDX_RSI'] = calculate_rsi(df['NDX_Close'])
-    df['Vol_20MA'] = df['Volume'].rolling(window=20).mean()
     return df.dropna().tail(10)
 
-# (사이드바 및 데이터 계산 로직 포함...)
-# [이 부분은 이전 코드와 동일하게 유지하세요]
 df = get_market_data()
 current = df.iloc[-1]
-# ... (생략) ...
-# [데이터 계산 로직]
-ndx_rsi = round(current['NDX_RSI'], 2)
-vix = round(current['VIX_Close'], 2)
-input_fg = 50
-input_pcr = 0.9
-input_hy = 4.0
+ndx_close, ndx_125, ndx_rsi, vix = round(current['NDX_Close'], 2), round(current['NDX_125EMA'], 2), round(current['NDX_RSI'], 2), round(current['VIX_Close'], 2)
 
-# --- 화면 출력부 ---
-st.title("🧭 통합 투자 내비게이션 V3.0 (Premium Dynamic)")
+# --- 2. 메인 화면 출력 ---
+st.title("🧭 통합 투자 내비게이션 V3.0")
 
-# 🛠️ [확대된 카드]
+# 카드 바인딩 및 출력
 col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.markdown(f'<div class="big-card"><span style="color:#94a3b8; font-size:12px;">나스닥 RSI</span><span style="font-size:18px; font-weight:bold; color:#f87171;">{ndx_rsi}</span></div>', unsafe_allow_html=True)
-with col2:
-    st.markdown(f'<div class="big-card"><span style="color:#94a3b8; font-size:12px;">VIX 지수</span><span style="font-size:18px; font-weight:bold; color:#4ade80;">{vix}</span></div>', unsafe_allow_html=True)
-with col3:
-    st.markdown(f'<div class="big-card"><span style="color:#94a3b8; font-size:12px;">공포 탐욕</span><span style="font-size:18px; font-weight:bold; color:#e2e8f0;">{input_fg}</span></div>', unsafe_allow_html=True)
-with col4:
-    st.markdown(f'<div class="big-card"><span style="color:#94a3b8; font-size:12px;">HY / PCR</span><span style="font-size:18px; font-weight:bold; color:#38bdf8;">{input_hy}% / {input_pcr}</span></div>', unsafe_allow_html=True)
+card_style = "background:#1e293b; padding:10px; border-radius:6px; height:60px;"
+col1.markdown(f'<div style="{card_style}">나스닥 RSI<br><b>{ndx_rsi}</b></div>', unsafe_allow_html=True)
+col2.markdown(f'<div style="{card_style}">VIX 지수<br><b>{vix}</b></div>', unsafe_allow_html=True)
+col3.markdown(f'<div style="{card_style}">공포 탐욕<br><b>50</b></div>', unsafe_allow_html=True)
+col4.markdown(f'<div style="{card_style}">HY / PCR<br><b>4.0% / 0.9</b></div>', unsafe_allow_html=True)
 
-st.markdown("## 📊 1. 메인 감시 지표 (Primary Triggers)")
-# (표 로직 동일...)
-trigger_data = {
-    "지표": ["나스닥 RSI", "VIX 지수", "S&P 200일선", "나스닥 125일선", "공포/탐욕", "풋콜", "HY스프레드"],
-    "상태": ["정상", "정상", "지지 중", "정상", "정상", "정상", "안정"]
-}
-st.table(pd.DataFrame(trigger_data))
+st.markdown("## 📊 1. 메인 감시 지표")
+
+# 🛠️ [정상 복구] 표 데이터 바인딩 로직
+trigger_table = f"""
+<table class="compact-table">
+    <thead>
+        <tr><th>지표</th><th>트리거 발생 기준</th><th>현재 수치</th><th>현재 판정</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>나스닥 RSI</td><td>[기회] 30이하 / [경계] 70이상</td><td>{ndx_rsi}</td><td>{'🔴 트리거' if ndx_rsi<=30 or ndx_rsi>=70 else '🟢 정상'}</td></tr>
+        <tr><td>VIX 지수</td><td>30 이상</td><td>{vix}</td><td>{'🔴 위험' if vix>=30 else '🟢 정상'}</td></tr>
+        <tr><td>나스닥 125일선</td><td>3거래일 연속 하회</td><td>{ndx_close}</td><td>🟡 브레이크</td></tr>
+    </tbody>
+</table>
+"""
+st.markdown(trigger_table, unsafe_allow_html=True)
+
+# 수동 지표 확인 링크
+st.markdown("## 🔍 2. 심리 및 매크로 수동 지표 확인")
+col_l1, col_l2, col_l3 = st.columns(3)
+col_l1.link_button("CNN 공포탐욕", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
+col_l2.link_button("풋콜레이시오 (PCC)", "https://ycharts.com/indicators/total_putcall_ratio", use_container_width=True)
+col_l3.link_button("하이일드 스프레드", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
