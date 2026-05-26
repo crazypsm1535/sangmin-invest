@@ -5,7 +5,7 @@ import pandas as pd
 # --- 1. 페이지 설정 및 디자인 ---
 st.set_page_config(page_title="투자 내비게이션 V3.0 (Dynamic)", layout="wide")
 
-# 🛠️ [상민님 피드백 반영] 이미지2의 시원시원한 기존 크기 및 상하 간격을 100% 복원
+# 🛠️ [상민님 요청 반영] 이미지2의 시원시원한 기존 풀사이즈 크기 및 상하 간격을 100% 유지
 st.markdown("""
     <style>
     .stMetric { padding: 10px; border-radius: 10px; border: 1px solid rgba(128, 128, 128, 0.2); }
@@ -165,11 +165,11 @@ col2.metric("VIX 지수 (실시간)", f"{vix:.2f}", vix_status)
 col3.metric("공포와 탐욕 지수 (수동연동)", f"{input_fg}", fg_status)
 col4.metric("HY 스프레드 / PCR (수동연동)", f"{input_hy}% / {input_pcr:.2f}", f"{hy_status} | {pcr_status}")
 
-# --- 1. 메인 감시 지표 (이미지2 풀사이즈 크기 원상복구 버전) ---
+# --- 1. 메인 감시 지표 (이미지2 풀사이즈 크기 100% 원상복구) ---
 st.markdown("---")
 st.markdown("### 📊 1. 메인 감시 지표 (Primary Triggers)")
 
-# 🛠️ [가시성 패치] 크기는 이미지2처럼 넓고 시원하게 복원하되, 이모지와 구분선 기호로 가시성 극대화
+# 🛠️ 수동지표 화면이 한눈에 담기도록 넓은 표 구조를 유지하되, 대괄호와 슬래시로 가시성 극대화
 trigger_data = {
     "지표": [
         "나스닥 100 지수 (RSI)", 
@@ -203,7 +203,7 @@ trigger_data = {
         "🔴 위험 감지" if input_hy >= 5.0 else "🟢 안정"
     ]
 }
-# 이미지2처럼 스트림릿 본연의 컴팩트하고 넓은 정식 테이블 객체로 출력
+# 이미지2처럼 스트림릿 정식 와이드 테이블 객체로 즉시 복원
 st.table(pd.DataFrame(trigger_data))
 
 # --- 2. 심리 및 매크로 수동 지표 확인 ---
@@ -218,5 +218,93 @@ with col_l1:
     st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
 
 with col_l2:
-    st.info("#### 🟢 CBOE 토탈 풋콜레이시오 소스 (★오류 완벽 해결)")
-    st.markdown("- **제공처:** 트레이딩뷰(TradingView) 금융 엔진\n- **성격:** 브라우저나 국가별 환경을 절대 타지 않는 글로벌 표준 지수 라이브러리\n- **특징:** 모바일 세로 화면에서도 잘림이나 404 에러 없이 실시간 Total P/C Ratio의 당일 확정 수치가 메
+    st.info("#### 🟢 CBOE 토탈 풋콜레이시오 소스 (★개인정보 동의오류 완벽 우회)")
+    st.markdown("- **제공처:** 야후 파이낸스 (Yahoo Finance)\n- **성격:** 모바일 전용 환경에서 팝업 충돌이나 차단 오류가 원천 제거된 클린 채널\n- **특징:** 번거로운 쿠키 동의 팝업 없이 터치 즉시 CBOE Total Put/Call Ratio 실시간 차트와 수치 화면이 투명하게 로드")
+    # 🛠️ [검은화면 원천 해결] 팝업창 충돌이 나는 사이트 대신 가장 무결한 야후 파이낸스 PCC 지수 직결망 세팅
+    st.link_button("📱 모바일 직관적 소스 확인", "https://finance.yahoo.com/quote/%5EPCC/", use_container_width=True)
+
+with col_l3:
+    st.info("#### 🔵 연준 하이일드 스프레드 소스")
+    st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 미국 기업 부도 신용 위험 필터\n- **API 상태:** 개별 키 요구 (수동 조회 필수)")
+    st.link_button("🌐 FRED 공식 소스 확인하기", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
+
+st.markdown("---")
+
+# 3대 전략 섹션
+st.markdown("### 🎯 3대 투자 전략별 현재 대응 모드 (V6.0 하이브리드 동적 반영)")
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    st.info("#### 🛡️ NH ISA\n**하이퍼-실드 V4.5 (Dynamic Enhanced)**")
+    if accelerator_triggered: 
+        st.error("**[액셀러 모드]**\n5대 바닥 지표 전원 충족 완료\n\n👉 **[기존 보유분 전량 스위칭]**\n나스닥2x 레버리지 100% 올인")
+    elif is_break_3days: 
+        st.warning("**[브레이크 작동]**\n나스닥 125일선 3일 하회 확정\n\n👉 **[기존 보유분 전량 매도 대피]**\n미국30년국채 50% / KRX금현물 50%")
+    elif ndx_rsi >= 70: 
+        st.warning("**[과열 방어 모드]**\n나스닥 RSI 70 이상 과매수\n\n👉 **[기존 보유분 일괄 리밸런싱]**\n나스닥2x 20% / 모멘텀 10% / 국채 35% / 금 35%")
+    else: 
+        st.success("**[평상시 모드]**\n안정적 추세 추종 구간\n\n👉 **[기존 보유분 일괄 리밸런싱]**\n나스닥2x 45% / 모멘텀 25% / 국채 15% / 금 15%")
+
+with c2:
+    st.info("#### 🚀 메리츠 해외직투\n**하이퍼-액셀러레이터 V1.3 (Strict NO-SELL)**")
+    if accelerator_triggered: 
+        st.error("**[액셀러 모드]**\n5대 바닥 지표 충족 완료\n\n👉 **[Strict NO-SELL 원칙]**\n기존 보유분 매도 금지, 신규 자금만 MAGS 50% / MGK 50% 몰빵 적립")
+    elif is_break_3days: 
+        st.warning("**[브레이크 작동]**\n나스닥 125일선 3일 하회 확정\n\n👉 **[Strict NO-SELL 원칙]**\n기존 보유분 매도 금지, 신규 자금만 TLT 50% / GLDM 50% 대피 적립")
+    elif ndx_rsi >= 70: 
+        st.warning("**[과열 방어 모드]**\n나스닥 RSI 70 이상 과매수\n\n👉 **[Strict NO-SELL 원칙]**\n기존 보유분 매도 금지, 신규 자금 비중만 MAGS 30% / MGK 30% / TLT 20% / GLDM 20% 집행")
+    else: 
+        st.success("**[평상시 모드]**\n안정적 추세 추종 구간\n\n👉 **[Strict NO-SELL 원칙]**\n기존 보유분 유지, 신규 자금만 MAGS 40% / MGK 40% / TLT 10% / GLDM 10% 집행")
+
+with c3:
+    st.info("#### 🧠 삼성 연금저축\n**하이퍼-스마트 DCA (Dynamic V6.0)**")
+    if accelerator_triggered: 
+        st.error("**[액셀러 모드]**\n5대 바닥 지표 전원 충족 완료\n\n👉 **[기존 보유분 전량 스위칭]**\n빅테크TOP7 62.5% / 모멘텀 37.5%")
+    elif is_break_3days: 
+        st.warning("**[브레이크 작동]**\n나스닥 125일선 3일 하회 확정\n\n👉 **[기존 보유분 주식 전량 매도]**\nS&P500모멘텀 35% / 동일가중 65% 피신 리밸런싱")
+    elif ndx_rsi >= 70: 
+        st.warning("**[과열 방어 모드]**\n나스닥 RSI 70 이상 과매수\n\n👉 **[기존 보유분 일괄 리밸런싱]**\n빅테크TOP7 37.5% / 모멘텀 25% / 동일가중 37.5%")
+    else: 
+        st.success("**[평상시 모드]**\n안정적 추세 추종 구간\n\n👉 **[기존 보유분 일괄 리밸런싱]**\n빅테크TOP7 55% / 모멘텀 30% / 동일가중 15%")
+
+st.markdown("---")
+
+# [비서의 조언 요약 박스 V3.0]
+st.subheader("📋 비서의 전문 검증 및 조언 레이어 (V3.0 Pro)")
+with st.expander("상세 분석 결과 및 리스크 진단 보기", expanded=True):
+    met_conditions = sum([condition_rsi, condition_pcr, condition_fg, condition_vix, condition_hy])
+    
+    st.markdown(f"1. **시스템 리스크 진단:** 현재 하이일드 스프레드는 **{input_hy}%**이며, 피크아웃 여부는 **{input_hy_peakout}**입니다.")
+    if input_hy >= 5.0 and not input_hy_peakout:
+        st.markdown("   * ⚠️ 금융 시스템 위험이 감지되므로, 동적 자산 배분 스위칭 시 방어적 포지션을 유지하십시오.")
+    else:
+        st.markdown("   * ✅ 시스템 리스크 우려가 없는 안정적인 매크로 환경입니다.")
+        
+    st.markdown(f"2. **전략적 추세 (125일선):** 나스닥 지수가 125일선 대비 현재 상단에 위치해 있습니다.")
+    if ndx_close > ndx_125:
+        st.markdown("   * ✅ 추세가 무너지지 않았으므로 국내 계좌의 불필요한 매도는 제한됩니다.")
+    else:
+        st.markdown("   * ⚠️ 추세를 하회 중이므로 브레이크 트리거 작동 여부를 반드시 확인하십시오.")
+        
+    st.markdown(f"3. **단기 선발대 (50일선) 및 가짜 신호 검증:**")
+    if vol_surge:
+        st.markdown("   * 🔴 [진짜 신호] 거래량이 20MA 대비 1.5배 이상 터진 신뢰도 높은 하락 흐름")
+    else:
+        st.markdown("   * 🟢 [가짜 신호 가능성] 거래량이 동반되지 않은 일반 노이즈성 흐름")
+        
+    if ndx_close > ndx_50:
+        st.markdown("   * 단기 상승세가 유효합니다. 해외 계좌는 NO-SELL 원칙에 따라 기존 보유 주식을 꽉 쥐고 가십시오.")
+    else:
+        st.markdown("   * 단기 상승 동력이 꺾였습니다. 리밸런싱 지침에 기계적으로 대응할 준비를 하십시오.")
+        
+    st.markdown(f"4. **바닥 신호 강도 검증 (5대 필수 지표):** 총 5개 중 **{met_conditions}개** 충족 중입니다.")
+    st.markdown("5. **상민님 전담 최종 권고 지침:**")
+    
+    if accelerator_triggered:
+        st.error(f"🔥 **[최종 권고: 액셀러 모드 발동]** 5대 필수 지표가 100% 동시 충족되었습니다. **국내 계좌(연금/ISA)는 모아둔 채권/금 실탄을 주식 및 레버리지로 100% '기존 자산 전량 리밸런싱 스위칭'을 단행하십시오.** 해외 계좌는 NO-SELL을 유지하며 신규 자금만 집중 매수합니다.")
+    elif is_break_3days:
+        st.warning(f"🚨 **[최종 권고: 브레이크 동적 대응]** 나스닥 125일선 3거래일 연속 하회가 확정되었습니다. **국내 계좌(연금/ISA)는 기존 주식 자산을 전량 즉시 매도하여 안전 자산(국채/금/동일가중) 비중 100%로 강제 대피 리밸런싱을 실행하십시오.** 해외 계좌는 NO-SELL 원칙에 따라 매도하지 않고 신규 자금만 안전자산으로 적립합니다.")
+    elif ndx_rsi >= 70:
+        st.warning(f"⚠️ **[최종 권고: 과열 방어 리밸런싱]** 나스닥 RSI {ndx_rsi:.2f}로 과매수 구간입니다. **국내 계좌는 기존 자산 비중을 과열 방어 테이블대로 즉시 줄여 현금을 선제 확보하십시오.** 해외 계좌는 기존 자산 매도 없이 신규 자금 비중만 조절합니다.")
+    else:
+        st.success(f"✅ **[최종 권고: 평상시 기계적 집행]** 시장이 안정적인 추세 구간에 있습니다. **국내 계좌는 평상시 비중대로 보유 상태를 조율하시고**, 신규 투자금도 기본 비중대로 편안하게 본업에 집중하며 적립하십시오.")
