@@ -5,7 +5,7 @@ import pandas as pd
 # --- 1. 페이지 설정 및 디자인 ---
 st.set_page_config(page_title="투자 내비게이션 V6.0 (Dynamic)", layout="wide")
 
-st.markdown("""
+st.markdown('''
     <style>
     .block-container { padding-top: 2.5rem !important; padding-bottom: 1rem !important; }
     h1 { margin-top: 0px !important; margin-bottom: 5px !important; font-size: 26px !important; font-weight: 800; }
@@ -14,7 +14,7 @@ st.markdown("""
     td { text-align: left !important; vertical-align: middle !important; padding: 8px 12px !important; font-size: 13px !important; white-space: nowrap !important; }
     div[data-testid="stTable"] table { width: 100% !important; margin-top: 0px !important; margin-bottom: 0px !important; }
     </style>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
 
 def calculate_rsi(series, period=14):
     delta = series.diff()
@@ -30,7 +30,6 @@ def calculate_rsi(series, period=14):
 @st.cache_data(ttl=3600)
 def get_market_data():
     try:
-        # download 방식으로 변경하여 안정성 확보 (빈 데이터 반환 방지)
         ndx = yf.download("^NDX", period="1y", progress=False)
         sp500 = yf.download("^GSPC", period="1y", progress=False)
         vix = yf.download("^VIX", period="1y", progress=False)
@@ -41,7 +40,6 @@ def get_market_data():
 
         df = pd.DataFrame(index=ndx.index)
         
-        # yfinance 최신 버전 MultiIndex 처리
         df['NDX_Close'] = ndx['Close'].iloc[:, 0] if isinstance(ndx.columns, pd.MultiIndex) else ndx['Close']
         df['SP500_Close'] = sp500['Close'].iloc[:, 0] if isinstance(sp500.columns, pd.MultiIndex) else sp500['Close']
         df['VIX_Close'] = vix['Close'].iloc[:, 0] if isinstance(vix.columns, pd.MultiIndex) else vix['Close']
@@ -155,15 +153,36 @@ with col4: st.markdown(f'<div style="{card_css}"><span style="font-size:13px; co
 
 st.markdown("## 📊 1. 메인 감시 지표 (Primary Triggers)")
 trigger_data = {
-    "지표": ["나스닥 100 지수 (RSI)", "VIX 지수", "S&P 500 (200일선)", "나스닥 100 (125일선)", "공포와 탐욕", "풋콜레이시오", "하이일드 스프레드"],
-    "트리거 발생 기준": ["🔵 30 이하 / 🔴 70 이상 ➔ 심리 과열 감시", "🚨 30 이상 ➔ 패닉 투매 감지", "❌ 지수 이탈 ➔ 장기 추세 붕괴", "⚠️ 3거래일 하회 ➔ 중장기 브레이크", "💀 25 미만 ➔ 극단적 공포", "📊 1.1 이상 ➔ 바닥 신호 응축", "⚡ 5.0% 이상 ➔ 금융위기 방어"],
+    "지표": ["나스닥 100 지수 (RSI)", "VIX 지수", "S&P 500 (200일선)", "나스닥 100 (125일선)", "공포와 탐욕 (수동)", "풋콜레이시오 (수동)", "하이일드 스프레드 (수동)"],
+    "트리거 발생 기준": ["🔵 [기회] 30 이하 / 🔴 [경계] 70 이상 ➔ 심리 과열 감시", "🚨 [위험] 30 이상 ➔ 패닉 투매 감지", "❌ [붕괴] 지수 이탈 ➔ 장기 추세 붕괴", "⚠️ [경고] 3거래일 하회 ➔ 중장기 브레이크", "💀 [공포] 25 미만 ➔ 극단적 공포", "📊 [바닥] 1.1 이상 ➔ 바닥 신호 응축", "⚡ [위험] 5.0% 이상 ➔ 금융위기 방어"],
     "현재 수치": [f"{ndx_rsi:.2f}", f"{vix:.2f}", f"{sp500_close:,.2f} ({sp500_200:,.2f})", f"{ndx_close:,.2f} ({ndx_125:,.2f})", f"{input_fg}", f"{input_pcr}", f"{input_hy}%"],
     "현재 판정": ["🔴 발동" if ndx_rsi <= 30 or ndx_rsi >= 70 else "🟢 정상", "🔴 위험" if vix >= 30 else "🟢 정상", "🔴 이탈" if sp500_close < sp500_200 else "🟢 지지", "🟡 브레이크" if is_break_3days else "🟢 정상", "🔴 기회" if input_fg <= 25 else "🟢 정상", "🔴 바닥" if input_pcr >= 1.1 else "🟢 정상", "🔴 위험" if input_hy >= 5.0 else "🟢 안정"]
 }
 st.table(pd.DataFrame(trigger_data))
 
+# --- 복구된 수동 지표 확인 섹션 ---
 st.markdown("---")
-st.markdown("### 🎯 3대 투자 전략별 현재 대응 모드 (V6.0 동적 반영)")
+st.markdown("### 🔍 2. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
+st.caption("자동 크롤링이 불가능한 핵심 지표들을 수동 검증하기 위한 데이터 소스 및 API 확인 라우터입니다.")
+
+col_l1, col_l2, col_l3 = st.columns(3)
+with col_l1:
+    st.info("#### 🔴 CNN 공포와 탐욕 지수 소스")
+    st.markdown("- **제공처:** CNN Business Market\n- **성격:** 군중 주관적 투자 심리 필터\n- **API 상태:** 외부 차단 (수동 조회 필수)")
+    st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
+
+with col_l2:
+    st.info("#### 🟢 CBOE 풋콜레이시오 소스 (★YCharts 검증 채널)")
+    st.markdown("- **제공처:** 와이차트 (YCharts)\n- **성격:** 클린망 채널\n- **특징:** 모바일 최적화")
+    st.link_button("📱 모바일 직관적 소스 확인", "https://ycharts.com/indicators/total_putcall_ratio", use_container_width=True)
+
+with col_l3:
+    st.info("#### 🔵 연준 하이일드 스프레드 소스")
+    st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 기업 부도 위험 필터\n- **API 상태:** 수동 조회 필수")
+    st.link_button("🌐 FRED 공식 소스 확인하기", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
+
+st.markdown("---")
+st.markdown("### 🎯 3. 3대 투자 전략별 현재 대응 모드 (V6.0 동적 반영)")
 c1, c2, c3 = st.columns(3)
 
 with c1:
@@ -186,3 +205,44 @@ with c3:
     elif is_break_3days: st.warning("**[브레이크 작동]**\n👉 **[주식 전량 매도]**\nTIME 배당다우존스 60% / KODEX 머니마켓 40%")
     elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n👉 **[리밸런싱]**\n빅테크TOP7 30% / 모멘텀 30% / 머니마켓 40%")
     else: st.success("**[평상시 모드]**\n👉 **[리밸런싱]**\n빅테크TOP7 50% / 모멘텀 35% / 머니마켓 15%")
+
+# --- 복구된 비서의 전문 검증 및 조언 섹션 ---
+st.markdown("---")
+st.subheader("📋 4. 비서의 전문 검증 및 조언 레이어 (V6.0 Pro)")
+with st.expander("상세 분석 결과 및 리스크 진단 보기", expanded=True):
+    met_conditions = sum([condition_rsi, condition_pcr, condition_fg, condition_vix, condition_hy])
+    
+    st.markdown(f"1. **시스템 리스크 진단:** 현재 하이일드 스프레드는 **{input_hy}%**이며, 피크아웃 여부는 **{input_hy_peakout}**입니다.")
+    if input_hy >= 5.0 and not input_hy_peakout:
+        st.markdown("   * ⚠️ 금융 시스템 위험이 감지되므로, 동적 자산 배분 스위칭 시 방어적 포지션을 유지하십시오.")
+    else:
+        st.markdown("   * ✅ 시스템 리스크 우려가 없는 안정적인 매크로 환경입니다.")
+        
+    st.markdown(f"2. **전략적 추세 (125일선):** 나스닥 지수가 125일선 대비 현재 상단에 위치해 있습니다.")
+    if ndx_close > ndx_125:
+        st.markdown("   * ✅ 추세가 무너지지 않았으므로 국내 계좌의 불필요한 매도는 제한됩니다.")
+    else:
+        st.markdown("   * ⚠️ 추세를 하회 중이므로 브레이크 트리거 작동 여부를 반드시 확인하십시오.")
+        
+    st.markdown(f"3. **단기 선발대 (50일선) 및 가짜 신호 검증:**")
+    if vol_surge:
+        st.markdown("   * 🔴 [진짜 신호] QQQ 거래량이 20MA 대비 1.5배 이상 터진 신뢰도 높은 하락 흐름")
+    else:
+        st.markdown("   * 🟢 [가짜 신호 가능성] 거래량이 동반되지 않은 일반 노이즈성 흐름")
+        
+    if ndx_close > ndx_50:
+        st.markdown("   * 단기 상승세가 유효합니다. 해외 계좌는 NO-SELL 원칙에 따라 기존 보유 주식을 꽉 쥐고 가십시오.")
+    else:
+        st.markdown("   * 단기 상승 동력이 꺾였습니다. 리밸런싱 지침에 기계적으로 대응할 준비를 하십시오.")
+        
+    st.markdown(f"4. **바닥 신호 강도 검증 (5대 필수 지표):** 총 5개 중 **{met_conditions}개** 충족 중입니다.")
+    st.markdown("5. **상민님 전담 최종 권고 지침:**")
+    
+    if accelerator_triggered:
+        st.error(f"🔥 **[최종 권고: 액셀러 모드 발동]** 5대 필수 지표가 100% 동시 충족되었습니다. **국내 계좌(연금/ISA)는 모아둔 초단기채/금/배당 실탄을 주식 및 레버리지로 100% '기존 자산 전량 리밸런싱 스위칭'을 단행하십시오.** 해외 계좌는 NO-SELL을 유지하며 신규 자금만 집중 매수합니다.")
+    elif is_break_3days:
+        st.warning(f"🚨 **[최종 권고: 브레이크 동적 대응]** 나스닥 125일선 3거래일 연속 하회가 확정되었습니다. **국내 계좌(연금/ISA)는 기존 주식 자산을 전량 즉시 매도하여 안전 방어 바구니(초단기채/금/배당) 비중 100%로 강제 대피 리밸런싱을 실행하십시오.** 해외 계좌는 NO-SELL 원칙에 따라 매도하지 않고 신규 자금만 방어 자산으로 적립합니다.")
+    elif ndx_rsi >= 70:
+        st.warning(f"⚠️ **[최종 권고: 과열 방어 리밸런싱]** 나스닥 RSI {ndx_rsi:.2f}로 과매수 구간입니다. **국내 계좌는 기존 자산 비중을 과열 방어 테이블대로 즉시 줄여 안전 자산을 선제 확보하십시오.** 해외 계좌는 기존 자산 매도 없이 신규 자금 비중만 조절합니다.")
+    else:
+        st.success(f"✅ **[최종 권고: 평상시 기계적 집행]** 시장이 안정적인 추세 구간에 있습니다. **국내 계좌는 평상시 비중대로 보유 상태를 조율하시고**, 신규 투자금도 기본 비중대로 편안하게 대구 다사읍 연구실 본업에 집중하며 적립하십시오.")
