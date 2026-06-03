@@ -26,7 +26,7 @@ def calculate_rsi(series, period=14):
     RS = _gain / _loss
     return 100 - (100 / (1 + RS))
 
-# 데이터 무한 대기(블랙스크린) 방지를 위한 예외 처리 탑재
+# 데이터 무한 대기 방지를 위한 예외 처리 탑재
 @st.cache_data(ttl=3600)
 def get_market_data():
     try:
@@ -121,7 +121,7 @@ with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
         cv4 = st.number_input("항목 4 금액", value=0, step=10000, key="c1_4")
         tot_val = cv1 + cv2 + cv3 + cv4
         if tot_val > 0:
-            st.info(f"**총 자산: {tot_val:,.0f}**\n\n- **항목 1:** {(cv1/tot_val)*100:.1f}%\n- **항목 2:** {(cv2/tot_val)*100:.1f}%\n- **항목 3:** {(cv3/tot_val)*100:.1f}%\n- **항목 4:** {(cv4/tot_val)*100:.1f}%")
+            st.info(f"**총 자산: {tot_val:,.0f}**\\n\\n- **항목 1:** {(cv1/tot_val)*100:.1f}%\\n- **항목 2:** {(cv2/tot_val)*100:.1f}%\\n- **항목 3:** {(cv3/tot_val)*100:.1f}%\\n- **항목 4:** {(cv4/tot_val)*100:.1f}%")
     with tab2:
         t_asset = st.number_input("총 투자 금액", value=1000000, step=10000, key="c2_tot")
         cp1 = st.number_input("항목 1 비중 (%)", value=40.0, step=1.0, key="c2_1")
@@ -132,7 +132,7 @@ with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
         if abs(tot_pct - 100.0) > 0.01:
             st.error(f"⚠️ 비중 합계 오류! (현재: {tot_pct}%)")
         else:
-            st.success(f"**배분 목표 (총 {t_asset:,.0f})**\n\n- **항목 1:** {t_asset*(cp1/100):,.0f}\n- **항목 2:** {t_asset*(cp2/100):,.0f}\n- **항목 3:** {t_asset*(cp3/100):,.0f}\n- **항목 4:** {t_asset*(cp4/100):,.0f}")
+            st.success(f"**배분 목표 (총 {t_asset:,.0f})**\\n\\n- **항목 1:** {t_asset*(cp1/100):,.0f}\\n- **항목 2:** {t_asset*(cp2/100):,.0f}\\n- **항목 3:** {t_asset*(cp3/100):,.0f}\\n- **항목 4:** {t_asset*(cp4/100):,.0f}")
 
 # --- 4. 메인 뷰 ---
 if sim_mode and not fetch_error:
@@ -140,13 +140,25 @@ if sim_mode and not fetch_error:
 elif not fetch_error:
     st.markdown("<p style='font-size:13px; margin-top:-8px; color:#94a3b8;'>본업에 집중하십시오. 국내 절세 계좌의 보유분 전량 스위칭 로직이 동기화된 코드입니다.</p>", unsafe_allow_html=True)
 
+# 4대 지표 동적 상태 텍스트
+rsi_status = "과열 (경계)" if ndx_rsi >= 70 else ("공포 (기회)" if ndx_rsi <= 30 else "정상 구간")
+vix_status = "위험 구간" if vix >= 30 else "안정 구간"
+fg_status = "극단적 공포" if input_fg <= 25 else "정상 구간"
+pcr_status = "바닥 신호" if input_pcr >= 1.1 else "정상 구간"
+
+# 🛠️ [색상 통일 업데이트] 풋콜레이시오 수치 색상을 다른 카드와 통일하여 가독성 동기화
 col1, col2, col3, col4 = st.columns(4)
 card_css = "background-color:#1e293b; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; height:38px;"
 
-with col1: st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1;">나스닥 RSI</span><span style="font-size:14px; font-weight:bold; color:#f87171;">{ndx_rsi:.2f}</span></div>', unsafe_allow_html=True)
-with col2: st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1;">VIX 지수</span><span style="font-size:14px; font-weight:bold; color:#4ade80;">{vix:.2f}</span></div>', unsafe_allow_html=True)
-with col3: st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1;">공포와 탐욕</span><span style="font-size:14px; font-weight:bold; color:#e2e8f0;">{input_fg}</span></div>', unsafe_allow_html=True)
-with col4: st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1;">HY / PCR</span><span style="font-size:14px; font-weight:bold; color:#38bdf8;">{input_hy}% / {input_pcr:.2f}</span></div>', unsafe_allow_html=True)
+with col1: 
+    st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1;">나스닥 RSI</span><span style="font-size:14px; font-weight:bold; color:{"#f87171;" if ndx_rsi >= 70 or ndx_rsi <= 30 else "#e2e8f0;"}">{ndx_rsi:.2f} ({rsi_status})</span></div>', unsafe_allow_html=True)
+with col2: 
+    st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1;">VIX 지수</span><span style="font-size:14px; font-weight:bold; color:{"#4ade80;" if vix < 30 else "#f87171;"}">{vix:.2f} ({vix_status})</span></div>', unsafe_allow_html=True)
+with col3: 
+    st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1;">공포와 탐욕</span><span style="font-size:14px; font-weight:bold; color:{"#ef4444;" if input_fg <= 25 else "#e2e8f0;"}">{input_fg} ({fg_status})</span></div>', unsafe_allow_html=True)
+with col4: 
+    # 🎨 풋콜레이시오 카드의 하늘색을 제거하고 조건에 따라 동적 통일 처리
+    st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#cbd5e1;">HY / PCR</span><span style="font-size:14px; font-weight:bold; color:{"#ef4444;" if input_pcr >= 1.1 else "#e2e8f0;"}">{input_hy}% / {input_pcr:.2f} ({pcr_status})</span></div>', unsafe_allow_html=True)
 
 st.markdown("## 📊 1. 메인 감시 지표 (Primary Triggers)")
 trigger_data = {
@@ -157,10 +169,10 @@ trigger_data = {
 }
 st.table(pd.DataFrame(trigger_data))
 
-# --- 수동 지표 확인 섹션 (Investing.com 100% 무중단 다이렉트망 우회 개정) ---
+# --- 수동 지표 확인 섹션 (Investing.com 명확한 라우팅) ---
 st.markdown("---")
 st.markdown("### 🔍 2. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
-st.caption("가입 유도, 차단 팝업, 404 에러가 원천 배제된 인베스팅닷컴 정식 심볼 직통망 링크로 교체 완료되었습니다.")
+st.caption("가입 유도, 차단 팝업, 404 에러가 원천 배제된 인베스팅닷컴 정식 심볼 직통망 링크로 전면 교체 완료되었습니다.")
 
 col_l1, col_l2, col_l3 = st.columns(3)
 with col_l1:
@@ -170,8 +182,8 @@ with col_l1:
 
 with col_l2:
     st.success("#### 🟢 Investing.com 풋콜레이시오 (무결성)")
-    st.markdown("- **제공처:** 글로벌 금융 포털 인베스팅닷컴 (Investing.com)\n- **티커:** `CBOE Put/Call Ratio`\n- **특징:** 유료 결제 창이나 로그인 유도 블러(Blur) 현상이 원천 차단된 청정 링크 채널. 언제든 터치 즉시 최신 Last Value 수치를 전면 가시망으로 확인 가능")
-    st.link_button("📱 인베스팅 클린 소스 확인", "https://www.investing.com/indices/cboe-put-call-ratio", use_container_width=True)
+    st.markdown("- **제공처:** 글로벌 금융 포털 인베스팅닷컴 (Investing.com)\n- **티커:** `CBOE Put/Call Ratio`\n- **특징:** 유료 결제 창이나 로그인 유도 블러 현상이 원천 차단된 청정 링크 채널. 언제든 터치 즉시 최신 Last Value 수치를 전면 가시망으로 확인 가능")
+    st.link_button("📱 인베스팅 공식 소스 확인", "https://www.investing.com/indices/cboe-put-call-ratio", use_container_width=True)
 
 with col_l3:
     st.info("#### 🔵 연준 하이일드 스프레드 소스")
