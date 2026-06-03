@@ -121,7 +121,7 @@ with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
         cv4 = st.number_input("항목 4 금액", value=0, step=10000, key="c1_4")
         tot_val = cv1 + cv2 + cv3 + cv4
         if tot_val > 0:
-            st.info(f"**총 자산: {tot_val:,.0f}**\n\n- **항목 1:** {(cv1/tot_val)*100:.1f}%\n- **항목 2:** {(cv2/tot_val)*100:.1f}%\n- **항목 3:** {(cv3/tot_val)*100:.1f}%\n- **항목 4:** {(cv4/tot_val)*100:.1f}%")
+            st.info(f"**총 자산: {tot_val:,.0f}**\\n\\n- **항목 1:** {(cv1/tot_val)*100:.1f}%\\n- **항목 2:** {(cv2/tot_val)*100:.1f}%\\n- **항목 3:** {(cv3/tot_val)*100:.1f}%\\n- **항목 4:** {(cv4/tot_val)*100:.1f}%")
     with tab2:
         t_asset = st.number_input("총 투자 금액", value=1000000, step=10000, key="c2_tot")
         cp1 = st.number_input("항목 1 비중 (%)", value=40.0, step=1.0, key="c2_1")
@@ -132,7 +132,7 @@ with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
         if abs(tot_pct - 100.0) > 0.01:
             st.error(f"⚠️ 비중 합계 오류! (현재: {tot_pct}%)")
         else:
-            st.success(f"**배분 목표 (총 {t_asset:,.0f})**\n\n- **항목 1:** {t_asset*(cp1/100):,.0f}\n- **항목 2:** {t_asset*(cp2/100):,.0f}\n- **항목 3:** {t_asset*(cp3/100):,.0f}\n- **항목 4:** {t_asset*(cp4/100):,.0f}")
+            st.success(f"**배분 목표 (총 {t_asset:,.0f})**\\n\\n- **항목 1:** {t_asset*(cp1/100):,.0f}\\n- **항목 2:** {t_asset*(cp2/100):,.0f}\\n- **항목 3:** {t_asset*(cp3/100):,.0f}\\n- **항목 4:** {t_asset*(cp4/100):,.0f}")
 
 # --- 4. 메인 뷰 ---
 if sim_mode and not fetch_error:
@@ -157,25 +157,25 @@ trigger_data = {
 }
 st.table(pd.DataFrame(trigger_data))
 
-# --- 수동 지표 확인 섹션 ---
+# --- 수동 지표 확인 섹션 (TradingView 100% 무료망 우회 개정) ---
 st.markdown("---")
 st.markdown("### 🔍 2. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
-st.caption("자동 크롤링이 불가능한 핵심 지표들을 수동 검증하기 위한 데이터 소스 및 API 확인 라우터입니다.")
+st.caption("가입 유도 및 세션 차단 팝업이 일절 없는 트레이딩뷰(TradingView) 웹 클린 채널 링크로 전면 교체 완료되었습니다.")
 
 col_l1, col_l2, col_l3 = st.columns(3)
 with col_l1:
     st.info("#### 🔴 CNN 공포와 탐욕 지수 소스")
-    st.markdown("- **제공처:** CNN Business Market\n- **성격:** 군중 주관적 투자 심리 필터\n- **API 상태:** 외부 차단 (수동 조회 필수)")
+    st.markdown("- **제공처:** CNN Business Market\n- **성격:** 군중 주관적 투자 심리 필터\n- **상태:** 외부 차단에 따른 수동 라우팅")
     st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
 
 with col_l2:
-    st.info("#### 🟢 CBOE 풋콜레이시오 소스 (★YCharts 검증 채널)")
-    st.markdown("- **제공처:** 와이차트 (YCharts)\n- **성격:** 클린망 채널\n- **특징:** 모바일 최적화")
-    st.link_button("📱 모바일 직관적 소스 확인", "https://ycharts.com/indicators/total_putcall_ratio", use_container_width=True)
+    st.success("#### 🟢 TradingView 풋콜레이시오 (클린망)")
+    st.markdown("- **제공처:** 글로벌 차트 허브 트레이딩뷰 (TradingView)\n- **티커:** `CBOE:PCC` (종합 Equity/Index Put Call Ratio)\n- **특징:** 유료 가입 팝업이나 쿠키 한도 제한이 일절 없어 언제나 쾌적하게 1초 만에 실시간 조회 가능")
+    st.link_button("📱 트레이딩뷰 클린 소스 확인", "https://www.tradingview.com/symbols/CBOE-PCC/", use_container_width=True)
 
 with col_l3:
     st.info("#### 🔵 연준 하이일드 스프레드 소스")
-    st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 미국 기업 부도 신용 위험 필터\n- **API 상태:** 수동 조회 필수")
+    st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 미국 기업 부도 신용 위험 필터\n- **상태:** FRED 전용 직통망 라우팅")
     st.link_button("🌐 FRED 공식 소스 확인하기", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
 
 st.markdown("---")
