@@ -1,4 +1,4 @@
-import streamlit st
+import streamlit as st
 import yfinance as yf
 import pandas as pd
 
@@ -39,7 +39,6 @@ def get_market_data():
             return None
 
         df = pd.DataFrame(index=ndx.index)
-        
         df['NDX_Close'] = ndx['Close'].iloc[:, 0] if isinstance(ndx.columns, pd.MultiIndex) else ndx['Close']
         df['SP500_Close'] = sp500['Close'].iloc[:, 0] if isinstance(sp500.columns, pd.MultiIndex) else sp500['Close']
         df['VIX_Close'] = vix['Close'].iloc[:, 0] if isinstance(vix.columns, pd.MultiIndex) else vix['Close']
@@ -61,7 +60,6 @@ st.title("🧭 통합 투자 내비게이션 V6.0 (Premium Dynamic)")
 df = get_market_data()
 fetch_error = False
 
-# 통신 에러 시 안전하게 기본값 세팅
 if df is None or df.empty:
     fetch_error = True
     st.error("🚨 실시간 시장 데이터(Yahoo Finance) 통신에 실패했습니다. 자동으로 '테스트 모드'로 전환됩니다.")
@@ -92,7 +90,6 @@ if sim_mode:
     ndx_rsi = st.sidebar.slider("나스닥 RSI 설정", 0.0, 100.0, 25.0, 0.1)
     vix = st.sidebar.slider("VIX 지수 설정", 0.0, 60.0, 35.0, 0.1)
     is_break_3days = st.sidebar.checkbox("나스닥 125일선 3일 연속 하회 상황 가정", value=False)
-    
     ndx_close = 18000.0 if is_break_3days else 20000.0
     ndx_125, ndx_50 = 19000.0, 19500.0
     sp500_close, sp500_200 = 5000.0, 4800.0
@@ -178,7 +175,7 @@ with col_l2:
 
 with col_l3:
     st.info("#### 🔵 연준 하이일드 스프레드 소스")
-    st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 기업 부도 위험 필터\n- **API 상태:** 수동 조회 필수")
+    st.markdown("- **제공처:** St. Louis Fed (FRED)\n- **성격:** 미국 기업 부도 신용 위험 필터\n- **API 상태:** 수동 조회 필수")
     st.link_button("🌐 FRED 공식 소스 확인하기", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
 
 st.markdown("---")
