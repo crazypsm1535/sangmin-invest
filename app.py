@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit st
 import yfinance as yf
 import pandas as pd
 
@@ -184,7 +184,6 @@ with col_l3:
 st.markdown("---")
 st.markdown("### 🎯 3. 3대 투자 전략별 현재 대응 모드 (V6.0 동적 반영)")
 
-# [배치 적용 완료] 왼쪽부터 연금저축 -> NH ISA -> 메리츠 해외직투 순서
 c1, c2, c3 = st.columns(3)
 
 with c1:
@@ -198,15 +197,15 @@ with c2:
     st.info("#### 🛡️ NH ISA\n**하이퍼-실드 V4.5 무결성 벙커**")
     if accelerator_triggered: st.error("**[액셀러 모드]**\n👉 **[전량 스위칭]**\nTIGER 미국나스닥100레버리지(418660) 100.0%")
     elif is_break_3days: st.warning("**[브레이크 작동]**\n👉 **[전량 대피]**\nACE KRX금현물 70.0% / KODEX 미국머니마켓액티브 30.0%")
-    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n👉 **[리밸런싱]**\nTIGER 레버리지 20.0% / KIWOOM 모멘텀 10.0% / ACE 금현물 49.0% / KODEX 머니마켓 21.0%")
-    else: st.success("**[평상시 모드]**\n👉 **[리밸런싱]**\nTIGER 레버리지 45.0% / KIWOOM 모멘텀 25.0% / ACE 금현물 21.0% / KODEX 머니마켓 9.0%")
+    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n👉 **[리밸런싱]**\nTIGER 레버리지 20.0% / ACE 미국빅테크TOP7 Plus 10.0% / ACE 금현물 49.0% / KODEX 머니마켓 21.0%")
+    else: st.success("**[평상시 모드]**\n👉 **[리밸런싱]**\nTIGER 레버리지 45.0% / ACE 미국빅테크TOP7 Plus 25.0% / ACE 금현물 21.0% / KODEX 머니마켓 9.0%")
 
 with c3:
     st.info("#### 🚀 메리츠 해외직투\n**하이퍼-액셀러레이터 V2.6 4대 자산 압축 최적안**")
-    if accelerator_triggered: st.error("**[액셀러 모드]**\n👉 **[NO-SELL]**\n신규: MAGS 55.0% / QLD 45.0% 집중 적립")
+    if accelerator_triggered: st.error("**[액셀러 모드]**\n👉 **[NO-SELL]**\n신규: QLD 45.0% / MAGS 55.0% 집중 적립")
     elif is_break_3days: st.warning("**[브레이크 작동]**\n👉 **[NO-SELL]**\n신규: SCHD 50.0% / GLDM 50.0% 대피 적립")
-    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n👉 **[NO-SELL]**\n신규: MAGS 30.0% / QLD 15.0% / SCHD 30.0% / GLDM 25.0%")
-    else: st.success("**[평상시 모드]**\n👉 **[NO-SELL]**\n신규: MAGS 45.0% / QLD 30.0% / SCHD 20.0% / GLDM 5.0% 집행")
+    elif ndx_rsi >= 70: st.warning("**[과열 방어]**\n👉 **[NO-SELL]**\n신규: QLD 15.0% / MAGS 30.0% / SCHD 30.0% / GLDM 25.0%")
+    else: st.success("**[평상시 모드]**\n👉 **[NO-SELL]**\n신규: QLD 45.0% / MAGS 30.0% / SCHD 20.0% / GLDM 5.0% 집행")
 
 # --- 비서의 전문 검증 및 조언 섹션 ---
 st.markdown("---")
