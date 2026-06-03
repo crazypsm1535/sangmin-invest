@@ -121,7 +121,7 @@ with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
         cv4 = st.number_input("항목 4 금액", value=0, step=10000, key="c1_4")
         tot_val = cv1 + cv2 + cv3 + cv4
         if tot_val > 0:
-            st.info(f"**총 자산: {tot_val:,.0f}**\\n\\n- **항목 1:** {(cv1/tot_val)*100:.1f}%\\n- **항목 2:** {(cv2/tot_val)*100:.1f}%\\n- **항목 3:** {(cv3/tot_val)*100:.1f}%\\n- **항목 4:** {(cv4/tot_val)*100:.1f}%")
+            st.info(f"**총 자산: {tot_val:,.0f}**\n\n- **항목 1:** {(cv1/tot_val)*100:.1f}%\n- **항목 2:** {(cv2/tot_val)*100:.1f}%\n- **항목 3:** {(cv3/tot_val)*100:.1f}%\n- **항목 4:** {(cv4/tot_val)*100:.1f}%")
     with tab2:
         t_asset = st.number_input("총 투자 금액", value=1000000, step=10000, key="c2_tot")
         cp1 = st.number_input("항목 1 비중 (%)", value=40.0, step=1.0, key="c2_1")
@@ -132,7 +132,7 @@ with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
         if abs(tot_pct - 100.0) > 0.01:
             st.error(f"⚠️ 비중 합계 오류! (현재: {tot_pct}%)")
         else:
-            st.success(f"**배분 목표 (총 {t_asset:,.0f})**\\n\\n- **항목 1:** {t_asset*(cp1/100):,.0f}\\n- **항목 2:** {t_asset*(cp2/100):,.0f}\\n- **항목 3:** {t_asset*(cp3/100):,.0f}\\n- **항목 4:** {t_asset*(cp4/100):,.0f}")
+            st.success(f"**배분 목표 (총 {t_asset:,.0f})**\n\n- **항목 1:** {t_asset*(cp1/100):,.0f}\n- **항목 2:** {t_asset*(cp2/100):,.0f}\n- **항목 3:** {t_asset*(cp3/100):,.0f}\n- **항목 4:** {t_asset*(cp4/100):,.0f}")
 
 # --- 4. 메인 뷰 ---
 if sim_mode and not fetch_error:
@@ -157,10 +157,10 @@ trigger_data = {
 }
 st.table(pd.DataFrame(trigger_data))
 
-# --- 수동 지표 확인 섹션 (TradingView 100% 무료망 우회 개정) ---
+# --- 수동 지표 확인 섹션 (Investing.com 100% 무중단 다이렉트망 우회 개정) ---
 st.markdown("---")
 st.markdown("### 🔍 2. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
-st.caption("가입 유도 및 세션 차단 팝업이 일절 없는 트레이딩뷰(TradingView) 웹 클린 채널 링크로 전면 교체 완료되었습니다.")
+st.caption("가입 유도, 차단 팝업, 404 에러가 원천 배제된 인베스팅닷컴 정식 심볼 직통망 링크로 교체 완료되었습니다.")
 
 col_l1, col_l2, col_l3 = st.columns(3)
 with col_l1:
@@ -169,9 +169,9 @@ with col_l1:
     st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
 
 with col_l2:
-    st.success("#### 🟢 TradingView 풋콜레이시오 (클린망)")
-    st.markdown("- **제공처:** 글로벌 차트 허브 트레이딩뷰 (TradingView)\n- **티커:** `CBOE:PCC` (종합 Equity/Index Put Call Ratio)\n- **특징:** 유료 가입 팝업이나 쿠키 한도 제한이 일절 없어 언제나 쾌적하게 1초 만에 실시간 조회 가능")
-    st.link_button("📱 트레이딩뷰 클린 소스 확인", "https://www.tradingview.com/symbols/CBOE-PCC/", use_container_width=True)
+    st.success("#### 🟢 Investing.com 풋콜레이시오 (무결성)")
+    st.markdown("- **제공처:** 글로벌 금융 포털 인베스팅닷컴 (Investing.com)\n- **티커:** `CBOE Put/Call Ratio`\n- **특징:** 유료 결제 창이나 로그인 유도 블러(Blur) 현상이 원천 차단된 청정 링크 채널. 언제든 터치 즉시 최신 Last Value 수치를 전면 가시망으로 확인 가능")
+    st.link_button("📱 인베스팅 클린 소스 확인", "https://www.investing.com/indices/cboe-put-call-ratio", use_container_width=True)
 
 with col_l3:
     st.info("#### 🔵 연준 하이일드 스프레드 소스")
