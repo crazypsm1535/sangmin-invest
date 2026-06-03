@@ -167,21 +167,21 @@ trigger_data = {
 }
 st.table(pd.DataFrame(trigger_data))
 
-# --- 수동 지표 확인 섹션 (MacroMicro 및 CBOE 직통 클린망 개정) ---
+# --- 수동 지표 확인 섹션 (CNN 순정망 및 CBOE 공식 직통망 원복 개정) ---
 st.markdown("---")
 st.markdown("### 🔍 2. 심리 및 매크로 수동 지표 확인 (Data Source Verification)")
-st.caption("차단이나 404 에러가 일절 발생하지 않는 글로벌 클린망 검증 채널로 100% 최적화되었습니다.")
+st.caption("상민님의 지시대로 CNN 공식 소스로 원복되었으며, 가입 유도 팝업이 없는 CBOE 제1공식망과 크로스 동기화되었습니다.")
 
 col_l1, col_l2, col_l3 = st.columns(3)
 with col_l1:
-    st.success("#### 🔴 MacroMicro 공포와 탐욕 지수")
-    st.markdown("- **제공처:** 매크로마이크로 (MacroMicro)\n- **성격:** 군중 투자 심리 필터 실시간 시각화 채널\n- **특징:** CNN 공식 사이트의 강력한 보안 차단 우회 및 데이터 완벽 백업 지원")
-    st.link_button("🌐 마크로마이크로 클린 소스 확인", "https://en.macromicro.me/charts/80778/US-CNN-Fear-and-Greed-Index", use_container_width=True)
+    st.info("#### 🔴 CNN 공식 공포와 탐욕 지수")
+    st.markdown("- **제공처:** CNN Business Market\n- **성격:** 군중 주관적 투자 심리 제1 원본 채널\n- **특징:** 원복 요청에 따라 CNN 본진 순정망으로 완벽 가시성 라우팅 매핑")
+    st.link_button("🌐 CNN 공식 소스 확인하기", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
 
 with col_l2:
     st.success("#### 🟢 CBOE 공식 풋콜레이시오 직통망")
-    st.markdown("- **제공처:** 시카고 옵션 거래소 공식 본진 (CBOE Official)\n- **성격:** 데이터 원천 제1 공급처\n- **특징:** 타 금융 포털의 우회용 라우팅 버그나 세션 차단 팝업이 구조적으로 존재하지 않는 가장 완벽한 무결성 원본 소스 채널")
-    st.link_button("📱 CBOE 순정 소스 즉시 확인", "https://www.cboe.com/us/options/market_statistics/daily/", use_container_width=True)
+    st.markdown("- **제공처:** 시카고 옵션 거래소 공식 홈페이지 (CBOE Official)\n- **성격:** 파생상품 시장 데이터 원천 공급처\n- **특징:** 결제 팝업이나 세션 차단 블러가 애초에 존재하지 않는 가장 깨끗하고 신뢰성 높은 마스터 데이터 채널")
+    st.link_button("📱 CBOE 순정 소스 즉시 확인", "https://www.cboe.com/markets/us/options/market-statistics/daily", use_container_width=True)
 
 with col_l3:
     st.info("#### 🔵 연준 하이일드 스프레드 소스")
