@@ -122,7 +122,6 @@ st.sidebar.subheader("📊 보조 감시 지표 (메인 신호 제외됨)")
 input_fg = st.sidebar.number_input("CNN 공포와 탐욕 지수", 0, 100, 25)
 input_pcr = st.sidebar.number_input("CBOE 풋콜레이시오", 0.0, 3.0, 1.02, 0.01)
 
-# 계산기 컴포넌트 생략 (기존 코드 유지)
 st.sidebar.markdown("---")
 st.sidebar.title("🧮 2종 자산 배분 계산기")
 with st.sidebar.expander("계산기 열기 (클릭)", expanded=False):
@@ -161,17 +160,23 @@ elif not fetch_error:
 col1, col2, col3, col4 = st.columns(4)
 card_css = "background-color:#161619; border:1px solid #3a3a42; border-left:4px solid #00e5ff; border-radius:4px; padding:10px 15px; display:flex; justify-content:space-between; align-items:center; height:45px;"
 
-with col1: st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">나스닥100 RSI</span><span style="font-size:16px; font-weight:bold; color:{"#ff4500" if ndx_rsi >= 70 else ("#00e5ff" if ndx_rsi <=30 else "#ffffff")};">{ndx_rsi:.2f}</span></div>', unsafe_allow_html=True)
-with col2: st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">VIX 지수</span><span style="font-size:16px; font-weight:bold; color:{"#00e5ff" if vix >= 30 else "#ffffff"};">{vix:.2f}</span></div>', unsafe_allow_html=True)
-with col3: st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">현재 스프레드</span><span style="font-size:16px; font-weight:bold; color:{"#ff9900" if input_hy >= 5.0 else "#ffffff"};">{input_hy}%</span></div>', unsafe_allow_html=True)
+with col1: 
+    st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">나스닥100 RSI</span><span style="font-size:16px; font-weight:bold; color:{"#ff4500" if ndx_rsi >= 70 else ("#00e5ff" if ndx_rsi <=30 else "#ffffff")};">{ndx_rsi:.2f}</span></div>', unsafe_allow_html=True)
+    st.link_button("🔍 수동 확인 (Yahoo)", "https://finance.yahoo.com/quote/%5ENDX/chart", use_container_width=True)
+    
+with col2: 
+    st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">VIX 지수</span><span style="font-size:16px; font-weight:bold; color:{"#00e5ff" if vix >= 30 else "#ffffff"};">{vix:.2f}</span></div>', unsafe_allow_html=True)
+    st.link_button("🔍 수동 확인 (Yahoo)", "https://finance.yahoo.com/quote/%5EVIX/chart", use_container_width=True)
+    
+with col3: 
+    st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">현재 스프레드</span><span style="font-size:16px; font-weight:bold; color:{"#ff9900" if input_hy >= 5.0 else "#ffffff"};">{input_hy}%</span></div>', unsafe_allow_html=True)
 with col4: 
     hy_status = "✅ 매수 승인(Pass)" if hy_approved else "⛔ 대기(Wait)"
     st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">하이일드 판정</span><span style="font-size:14px; font-weight:bold; color:#00ff66;">{hy_status}</span></div>', unsafe_allow_html=True)
 
-# --- [상민님 요청] 1. 시스템 확정 모드 및 실시간 동적 시황 해설 ---
+# --- 1. 시스템 확정 모드 및 실시간 동적 시황 해설 ---
 st.markdown("## 🎯 1. V7.1 시스템 확정 모드 (Action Required)")
 
-# 시장 모드 표출 및 각 모드별 지표 매칭 사유 동적 생성
 if current_mode == "액셀러":
     st.error("### 🔵 [액셀러 모드] 7:3 기동 타격 집행 (대바닥)")
     hy_reason = f"절대 기준선인 3.50% 이하({input_hy}%)이거나 피크아웃 조건(-0.20%p 꺾임)을 충족" if hy_approved else "조건 미달"
@@ -258,13 +263,27 @@ st.markdown("---")
 st.subheader("📋 3. 투자비서 데이터 무결성 검증 레이어")
 with st.expander("가짜 속임수 신호 판독 및 매크로 리스크 결과 보기", expanded=True):
     st.markdown(f"1. **가짜 하락 차단 (거래량):**")
-    st.markdown("   * 🔴 **[패스]**" if vol_surge else "   * 🟢 **[주의]** 거래량이 동반되지 않은 단순 노이즈(속임수) 가능성 존재.")
+    v_col1, v_col2 = st.columns([5, 1])
+    with v_col1:
+        st.markdown("   * 🔴 **[패스]**" if vol_surge else "   * 🟢 **[주의]** 거래량이 동반되지 않은 단순 노이즈(속임수) 가능성 존재.")
+    with v_col2:
+        st.link_button("🔍 수동 확인", "https://finance.yahoo.com/quote/QQQ/history", use_container_width=True)
+        
     st.markdown(f"2. **단기 추세 판독 (50일선):**")
-    st.markdown("   * 🟢 지수가 50일선 위에 있습니다." if ndx_close > ndx_50 else "   * 🔴 지수가 50일선 아래로 무너졌습니다.")
+    m_col1, m_col2 = st.columns([5, 1])
+    with m_col1:
+        st.markdown("   * 🟢 지수가 50일선 위에 있습니다." if ndx_close > ndx_50 else "   * 🔴 지수가 50일선 아래로 무너졌습니다.")
+    with m_col2:
+        st.link_button("🔍 수동 확인", "https://finance.yahoo.com/quote/%5ENDX/chart", use_container_width=True)
+        
     st.markdown(f"3. **하이일드 피크아웃 공식 검증:**")
-    if input_hy <= 3.50: st.markdown(f"   * ✅ 현재 {input_hy}%로 절대 수치 3.50% 이하입니다. **[가짜 위기 프리패스]** 완료.")
-    elif (input_hy_max - input_hy) >= 0.20: st.markdown(f"   * ✅ 최고점 대비 부도 위험이 -0.20%p 이상 확실히 주저앉았습니다. **[피크아웃 사격 승인]** 완료.")
-    else: st.markdown("   * ⛔ 아직 피크아웃 조건 미달입니다. 지하실 리스크를 경계하십시오.")
+    h_col1, h_col2 = st.columns([5, 1])
+    with h_col1:
+        if input_hy <= 3.50: st.markdown(f"   * ✅ 현재 {input_hy}%로 절대 수치 3.50% 이하입니다. **[가짜 위기 프리패스]** 완료.")
+        elif (input_hy_max - input_hy) >= 0.20: st.markdown(f"   * ✅ 최고점 대비 부도 위험이 -0.20%p 이상 확실히 주저앉았습니다. **[피크아웃 사격 승인]** 완료.")
+        else: st.markdown("   * ⛔ 아직 피크아웃 조건 미달입니다. 지하실 리스크를 경계하십시오.")
+    with h_col2:
+        st.link_button("🔍 수동 확인", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
 
 st.markdown("---")
 st.caption("🌐 공식 데이터 소스 다이렉트 라우팅")
