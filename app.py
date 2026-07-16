@@ -151,6 +151,31 @@ elif ndx_rsi >= 70:
 else:
     current_mode = "평상시"
 
+# --- 이 부분을 기존 코드의 해당 영역과 정확히 맞교환하세요 ---
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("📉 필수 채권 지표 입력 (FRED)")
+
+# [추가] 지표 입력 제어 스위치 (딱 여기에 위치해야 시각적으로 완벽합니다)
+macro_manual_mode = st.sidebar.toggle("🔓 수동 입력 모드 활성화 (ON/OFF)", value=False)
+
+if macro_manual_mode:
+    st.sidebar.info("✅ [수동 모드] 아래 지표들을 직접 수정할 수 있습니다.")
+    is_locked = False
+else:
+    st.sidebar.success("🔒 [자동 잠금] 지표가 고정되어 실수로 변경되지 않습니다.")
+    is_locked = True
+
+input_hy = st.sidebar.number_input("1. 현재 하이일드 스프레드 (%)", 0.0, 20.0, 2.71, 0.01, disabled=is_locked)
+input_hy_max = st.sidebar.number_input("2. 최근 20일 내 최고점 수치 (%)", 0.0, 20.0, 4.26, 0.01, disabled=is_locked)
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("📊 보조 감시 지표 (메인 신호 제외됨)")
+input_fg = st.sidebar.number_input("CNN 공포와 탐욕 지수", 0, 100, 47, disabled=is_locked) # 스크린샷 값 반영
+input_pcr = st.sidebar.number_input("CBOE 풋콜레이시오", 0.0, 3.0, 0.93, 0.01, disabled=is_locked) # 스크린샷 값 반영
+
+# --- 교환 영역 끝 ---
+
 # --- 4. 메인 뷰 대시보드 ---
 if sim_mode and not fetch_error:
     st.error("⚠️ 현재 [인위적 테스트 모드]가 활성화 중입니다. 실제 시장 데이터가 아닙니다.")
