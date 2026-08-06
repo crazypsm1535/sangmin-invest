@@ -6,7 +6,7 @@ import warnings
 # 불필요한 터미널 경고 메시지 숨김
 warnings.filterwarnings('ignore')
 
-# --- 1. 페이지 설정 및 다크 그레이 디자인 (가장 먼저 실행) ---
+# --- 1. 페이지 설정 및 다크 그레이 디자인 ---
 st.set_page_config(page_title="통합 내비게이션 V8.1 (Ultimate Dark)", layout="wide")
 
 st.markdown("""
@@ -71,7 +71,6 @@ def get_market_data():
         
         return df.dropna()
     except Exception:
-        # 에러 시 무한 대기를 멈추고 None 반환하여 수동 모드 발동
         return None
 
 # --- 2. 사이드바 (지표 입력 및 수동 조작계) ---
@@ -169,19 +168,23 @@ def render_main_dashboard():
     elif not fetch_error:
         st.markdown("<p style='font-size:13px; margin-top:-8px; color:#a1a1aa;'>본업에 집중하십시오. 60초마다 실시간으로 동기화 중입니다.</p>", unsafe_allow_html=True)
 
-    # 상단 4구역 지표 요약
+    # 상단 4구역 지표 요약 및 버튼 복구
     col1, col2, col3, col4 = st.columns(4)
     card_css = "background-color:#161619; border:1px solid #3a3a42; border-left:4px solid #00e5ff; border-radius:4px; padding:10px 15px; display:flex; justify-content:space-between; align-items:center; height:45px;"
 
     with col1: 
         st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">QLD 200일선 추세</span><span style="font-size:16px; font-weight:bold; color:{"#ff4500" if active_break else "#00ff66"};">{"붕괴(Break)" if active_break else "정상(Pass)"}</span></div>', unsafe_allow_html=True)
+        st.link_button("🔍 수동 확인 (Yahoo)", "https://finance.yahoo.com/quote/QLD/chart", use_container_width=True)
     with col2: 
         st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">나스닥100 RSI</span><span style="font-size:16px; font-weight:bold; color:{"#ff4500" if active_rsi >= 70 else ("#00e5ff" if active_rsi <=30 else "#ffffff")};">{active_rsi:.2f}</span></div>', unsafe_allow_html=True)
+        st.link_button("🔍 수동 확인 (Yahoo)", "https://finance.yahoo.com/quote/%5ENDX/chart", use_container_width=True)
     with col3: 
         st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">VIX 지수</span><span style="font-size:16px; font-weight:bold; color:{"#00e5ff" if active_vix >= 30 else "#ffffff"};">{active_vix:.2f}</span></div>', unsafe_allow_html=True)
+        st.link_button("🔍 수동 확인 (Yahoo)", "https://finance.yahoo.com/quote/%5EVIX/chart", use_container_width=True)
     with col4: 
         hy_status = "✅ 매수 승인(Pass)" if hy_approved else "⛔ 대기(Wait)"
         st.markdown(f'<div style="{card_css}"><span style="font-size:13px; color:#a1a1aa;">하이일드 판정</span><span style="font-size:14px; font-weight:bold; color:#00ff66;">{hy_status}</span></div>', unsafe_allow_html=True)
+        st.link_button("🔍 수동 확인 (FRED)", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
 
     # 1. 시스템 모드 액션
     st.markdown("## 🎯 1. V8.1 시스템 확정 모드 (Action Required)")
@@ -216,28 +219,52 @@ def render_main_dashboard():
         p3_w = "SCHD 100% 청산 대피" if current_mode == "브레이크" else "QLD 100% 스위칭" if current_mode == "엑셀러" else "<b>QLD 80% / SCHD 20%</b>"
         st.markdown(f'<div class="portfolio-card" style="border-left: 5px solid #ff3366;"><div class="portfolio-card-header" style="color: #ff3366;">🚀 해외직투 (토스)</div><div class="portfolio-card-desc">[대피형]</div><div class="portfolio-card-content">{p3_w}</div></div>', unsafe_allow_html=True)
 
-    # 3. 무결성 검증 레이어
+    # 3. 무결성 검증 레이어 (UI 컬럼 분할 및 수동 확인 버튼 100% 복구)
     st.markdown("---")
     st.subheader("📋 3. 투자비서 데이터 무결성 검증 레이어")
     with st.expander("가짜 속임수 신호 판독 및 매크로 리스크 결과 보기", expanded=True):
         st.markdown("1. **가짜 하락 차단 (거래량):**")
-        st.markdown("   * 🔴 **[패스]** 거래량 폭발 조건 충족." if vol_surge else "   * 🟢 **[주의]** 거래량이 동반되지 않은 노이즈 가능성.")
-        
+        v_col1, v_col2 = st.columns([5, 1])
+        with v_col1:
+            st.markdown("   * 🔴 **[패스]** 거래량 폭발 조건 충족." if vol_surge else "   * 🟢 **[주의]** 거래량이 동반되지 않은 노이즈 가능성.")
+        with v_col2:
+            st.link_button("🔍 수동 확인", "https://finance.yahoo.com/quote/QQQ/history", use_container_width=True)
+            
         st.markdown("2. **시장 폭 내부 체력 스캐닝 (Breadth):**")
-        st.markdown(f"   * 🟢 현재 {input_breadth}%로 양호합니다." if input_breadth >= 50 else f"   * 🔴 현재 {input_breadth}%로 50%를 하회합니다. (소수 빅테크 쏠림 착시 경계)")
-        
+        b_col1, b_col2 = st.columns([5, 1])
+        with b_col1:
+            st.markdown(f"   * 🟢 현재 {input_breadth}%로 양호합니다." if input_breadth >= 50 else f"   * 🔴 현재 {input_breadth}%로 50%를 하회합니다. (소수 빅테크 쏠림 착시 경계)")
+        with b_col2:
+            st.link_button("🔍 수동 확인", "https://stockcharts.com/freecharts/", use_container_width=True)
+            
         st.markdown("3. **CBOE 풋콜레이시오 (PCR) 극단 공포 판독:**")
-        st.markdown(f"   * 🔴 극단 공포 도달 ({input_pcr}). 역발상 매수 최적기 가능성." if input_pcr >= 1.1 else f"   * 🟢 현재 {input_pcr}로 안정 수준.")
-        
+        p_col1, p_col2 = st.columns([5, 1])
+        with p_col1:
+            st.markdown(f"   * 🔴 극단 공포 도달 ({input_pcr}). 역발상 매수 최적기 가능성." if input_pcr >= 1.1 else f"   * 🟢 현재 {input_pcr}로 안정 수준.")
+        with p_col2:
+            st.link_button("🔍 수동 확인", "https://www.cboe.com/markets/us/options/market-statistics/daily", use_container_width=True)
+            
         st.markdown("4. **하이일드 피크아웃 공식 검증:**")
-        if input_hy <= 3.50: 
-            st.markdown(f"   * ✅ 현재 {input_hy}% (3.50% 이하). **[가짜 위기 프리패스]** 완료.")
-        elif (input_hy_max - input_hy) >= 0.20: 
-            st.markdown(f"   * ✅ 최고점 대비 부도 위험이 -0.20%p 이상 하락. **[피크아웃 사격 승인]** 완료.")
-        else: 
-            st.markdown("   * ⛔ 피크아웃 조건 미달. 지하실 리스크를 경계하십시오.")
+        h_col1, h_col2 = st.columns([5, 1])
+        with h_col1:
+            if input_hy <= 3.50: 
+                st.markdown(f"   * ✅ 현재 {input_hy}% (3.50% 이하). **[가짜 위기 프리패스]** 완료.")
+            elif (input_hy_max - input_hy) >= 0.20: 
+                st.markdown(f"   * ✅ 최고점 대비 부도 위험이 -0.20%p 이상 하락. **[피크아웃 사격 승인]** 완료.")
+            else: 
+                st.markdown("   * ⛔ 피크아웃 조건 미달. 지하실 리스크를 경계하십시오.")
+        with h_col2:
+            st.link_button("🔍 수동 확인", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
 
-    # 4. 운영 가이드
+    # 4. 공식 데이터 소스 다이렉트 라우팅 (V7.2 푸터 복구)
+    st.markdown("---")
+    st.caption("🌐 공식 데이터 소스 다이렉트 라우팅")
+    cl1, cl2, cl3 = st.columns(3)
+    with cl1: st.link_button("🔵 FRED 하이일드 스프레드 (필수)", "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", use_container_width=True)
+    with cl2: st.link_button("🟢 CBOE 풋콜레이시오 (보조)", "https://www.cboe.com/markets/us/options/market-statistics/daily", use_container_width=True)
+    with cl3: st.link_button("🔴 CNN 공포와 탐욕 지수 (보조)", "https://edition.cnn.com/markets/fear-and-greed", use_container_width=True)
+
+    # 5. 운영 가이드
     st.markdown("---")
     st.subheader("📚 4. V8.1 시스템 운영 가이드 및 지표 해설")
     with st.expander("성공적인 장기 투자를 위한 비서의 핵심 조언 및 각 지표의 기준 (클릭하여 펼치기)", expanded=False):
